@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Servicios independientes — Workify</title>
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+<nav class="navbar" id="main-nav">
+  <a href="/" class="navbar-brand">Workify<span class="brand-dot"></span></a>
+  <div class="navbar-nav">
+    <a href="/pages/index.html" class="nav-link"><i class="fa-solid fa-house fa-sm"></i> Inicio</a>
+    <a href="/pages/ofertas.html" class="nav-link"><i class="fa-solid fa-briefcase fa-sm"></i> Ofertas</a>
+    <a href="/pages/servicios.html" class="nav-link active"><i class="fa-solid fa-wrench fa-sm"></i> Servicios</a>
+  </div>
+  <div class="navbar-actions">
+    <button class="notif-btn" id="nav-notif-btn" onclick="openNotificaciones()" style="display:none">
+      <i class="fa-regular fa-bell"></i>
+      <span class="notif-badge" id="notif-count" style="display:none">0</span>
+    </button>
+    <a href="/pages/publicar.html" class="btn btn-teal btn-sm" id="nav-publicar-btn" style="display:none"><i class="fa-solid fa-plus"></i> Publicar</a>
+    <a href="/pages/perfil.html" class="btn btn-outline btn-sm" id="nav-perfil-btn"
+       style="display:none;background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.2);color:white"><i class="fa-solid fa-user"></i> Mi perfil</a>
+    <a href="/pages/admin.html" class="btn btn-sm" id="nav-admin-btn"
+       style="display:none;background:rgba(245,158,11,.15);color:#f59e0b;border:1px solid rgba(245,158,11,.3)"><i class="fa-solid fa-shield"></i> Admin</a>
+    <button class="btn btn-primary btn-sm" id="nav-auth-btn" onclick="openAuthModal()"><i class="fa-solid fa-arrow-right-to-bracket"></i> Ingresar</button>
+  </div>
+</nav>
+
+<div style="background:linear-gradient(135deg,#064e3b,#065f46);padding:2.5rem 1.5rem 2rem">
+  <div class="container">
+    <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:.5rem">
+      <div style="width:40px;height:40px;background:rgba(0,188,212,.2);border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center">
+        <i class="fa-solid fa-wrench" style="color:#5eead4"></i>
+      </div>
+      <h1 style="font-size:1.6rem;color:white;margin:0">Servicios independientes</h1>
+    </div>
+    <p style="color:rgba(255,255,255,.6);font-size:.92rem">Profesionales calificados listos para ayudarte</p>
+  </div>
+</div>
+
+<div class="container section">
+  <div class="filters-bar">
+    <div class="filter-group">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input type="text" id="f-q" placeholder="Buscar servicio o profesional..." oninput="debounceBuscar()">
+    </div>
+    <div class="divider"></div>
+    <div class="filter-group" style="max-width:180px">
+      <i class="fa-solid fa-tag"></i>
+      <select id="f-categoria" onchange="buscar()">
+        <option value="">Todas las categorías</option>
+        <option value="construccion">Construcción</option>
+        <option value="electricidad">Electricidad</option>
+        <option value="pintura">Pintura</option>
+        <option value="fontaneria">Fontanería</option>
+        <option value="tecnologia">Tecnología</option>
+        <option value="otros">Otros</option>
+      </select>
+    </div>
+    <div class="divider"></div>
+    <div class="filter-group" style="max-width:140px">
+      <i class="fa-solid fa-star"></i>
+      <select id="f-estrellas" onchange="buscar()">
+        <option value="">Calificación</option>
+        <option value="4">4+ estrellas</option>
+        <option value="3">3+ estrellas</option>
+      </select>
+    </div>
+    <div class="divider"></div>
+    <label style="display:flex;align-items:center;gap:.4rem;font-size:.85rem;color:var(--gray-600);cursor:pointer;white-space:nowrap">
+      <input type="checkbox" id="f-destacado" onchange="buscar()" style="accent-color:var(--teal)">
+      Solo destacados
+    </label>
+    <button class="btn btn-ghost btn-sm" onclick="limpiarFiltros()"><i class="fa-solid fa-rotate-left"></i> Limpiar</button>
+  </div>
+
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
+    <p style="font-size:.88rem;color:var(--gray-500)" id="results-info">Cargando...</p>
+  </div>
+
+  <div class="grid-3" id="servicios-grid">
+    <div class="loading-overlay" style="grid-column:1/-1">
+      <span class="spinner dark"></span><span>Cargando servicios...</span>
+    </div>
+  </div>
+
+  <div style="display:flex;justify-content:center;gap:.5rem;margin-top:2rem" id="pagination"></div>
+</div>
+
+<footer style="background:var(--navy-dark);padding:1.5rem;text-align:center">
+  <p style="color:rgba(255,255,255,.4);font-size:.8rem">© 2025 Workify</p>
+</footer>
+
+<script src="/js/core.js"></script>
+<script>
+let currentPage = 1;
+let debounceTimer;
+let allServicios = [];
+
+window.addEventListener('DOMContentLoaded', () => {
+  const p = new URLSearchParams(window.location.search);
+  if (p.get('q'))         document.getElementById('f-q').value         = p.get('q');
+  if (p.get('categoria')) document.getElementById('f-categoria').value = p.get('categoria');
+  buscar();
+});
+
+function debounceBuscar() {
+  clearTimeout(debounceTimer);
+  debounceTimer = setTimeout(buscar, 400);
+}
+
+function limpiarFiltros() {
+  ['f-q','f-categoria','f-estrellas'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('f-destacado').checked = false;
+  currentPage = 1;
+  buscar();
+}
+
+async function buscar(page = 1) {
+  currentPage = page;
+  const q         = document.getElementById('f-q').value;
+  const categoria = document.getElementById('f-categoria').value;
+  const destacado = document.getElementById('f-destacado').checked;
+  const minEst    = parseInt(document.getElementById('f-estrellas').value) || 0;
+
+  const params = new URLSearchParams({ tipo: 'servicio', page, limit: 9 });
+  if (q)         params.set('q', q);
+  if (categoria) params.set('categoria', categoria);
+  if (destacado) params.set('destacado', 'true');
+
+  document.getElementById('servicios-grid').innerHTML = `
+    <div class="loading-overlay" style="grid-column:1/-1">
+      <span class="spinner dark"></span><span>Buscando...</span>
+    </div>`;
+
+  try {
+    const data = await api.get(`/api/publicaciones?${params.toString()}`);
+    let pubs = data.publicaciones || [];
+    if (minEst) pubs = pubs.filter(s => parseFloat(s.promedio_estrellas || 0) >= minEst);
+    renderServicios(pubs, data.total, data.totalPages);
+  } catch {
+    Toast.error('Error al cargar servicios');
+  }
+}
+
+function renderServicios(servicios, total, totalPages) {
+  document.getElementById('results-info').textContent =
+    total === 0 ? 'Sin resultados' : `${total} servicio${total !== 1 ? 's' : ''} encontrado${total !== 1 ? 's' : ''}`;
+
+  if (!servicios.length) {
+    document.getElementById('servicios-grid').innerHTML = `
+      <div class="empty-state" style="grid-column:1/-1">
+        <i class="fa-solid fa-wrench"></i>
+        <h3>No se encontraron servicios</h3>
+        <p>Intenta con otros filtros.</p>
+        <button class="btn btn-outline btn-sm" onclick="limpiarFiltros()">Limpiar filtros</button>
+      </div>`;
+    document.getElementById('pagination').innerHTML = '';
+    return;
+  }
+
+  document.getElementById('servicios-grid').innerHTML = servicios.map(renderServicioCard).join('');
+  renderPagination(totalPages);
+}
+
+function renderServicioCard(s) {
+  const d    = s.detalles || {};
+  const prom = parseFloat(s.promedio_estrellas || 0);
+  const tot  = s.total_calificaciones || 0;
+  return `
+    <div class="job-card service-card fade-up" onclick="verDetalleServicio(${s.id})">
+      ${s.destacado ? '<span class="badge badge-destacado" style="position:absolute;top:.75rem;right:.75rem"><i class="fa-solid fa-star" style="font-size:.6rem"></i> Destacado</span>' : ''}
+      <div style="display:flex;gap:.75rem;margin-bottom:.85rem">
+        <div style="width:44px;height:44px;background:rgba(0,188,212,.1);border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <i class="fa-solid fa-user-tie" style="color:var(--teal)"></i>
+        </div>
+        <div style="flex:1;min-width:0">
+          <h3 style="font-size:.95rem;font-weight:700;color:var(--navy);margin-bottom:.15rem;line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${s.titulo}</h3>
+          <p style="font-size:.78rem;color:var(--gray-500)">${s.usuarios?.nombre || 'Profesional'}</p>
+        </div>
+      </div>
+      <div style="margin-bottom:.75rem">${renderEstrellas(prom, tot)}</div>
+      <div style="display:flex;flex-wrap:wrap;gap:.35rem;margin-bottom:.85rem">
+        ${d.experiencia   ? `<span class="badge badge-teal">${d.experiencia} años exp.</span>` : ''}
+        ${d.precio_aprox  ? `<span class="badge badge-green">S/ ${d.precio_aprox}</span>` : ''}
+        ${d.categoria     ? `<span class="badge badge-gray">${d.categoria}</span>` : ''}
+      </div>
+      ${s.descripcion ? `<p style="font-size:.82rem;color:var(--gray-500);line-height:1.5;margin-bottom:.75rem;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">${s.descripcion}</p>` : ''}
+      <div style="display:flex;align-items:center;justify-content:space-between;font-size:.78rem;color:var(--gray-400);padding-top:.75rem;border-top:1px solid var(--gray-50)">
+        <span><i class="fa-solid fa-location-dot fa-sm" style="margin-right:.25rem"></i>${s.ubicacion || '—'}</span>
+        <span style="color:var(--teal);font-weight:600;font-size:.8rem">
+          <i class="fa-brands fa-whatsapp"></i> Contactar
+        </span>
+      </div>
+    </div>`;
+}
+
+function renderPagination(totalPages) {
+  if (totalPages <= 1) { document.getElementById('pagination').innerHTML = ''; return; }
+  let html = '';
+  for (let i = 1; i <= totalPages; i++) {
+    html += `<button class="btn btn-sm ${i === currentPage ? 'btn-teal' : 'btn-outline'}" onclick="buscar(${i})">${i}</button>`;
+  }
+  document.getElementById('pagination').innerHTML = html;
+}
+
+async function verDetalleServicio(id) {
+  Panel.open({
+    title: 'Cargando...',
+    subtitle: '',
+    body: '<div class="loading-overlay"><span class="spinner dark"></span>Cargando...</div>'
+  });
+  try {
+    const pub = await api.get(`/api/publicaciones/${id}`);
+    renderDetalleServicio(pub);
+  } catch {
+    Panel.setBody('<div class="empty-state"><i class="fa-solid fa-circle-exclamation"></i><h3>Error al cargar</h3></div>');
+  }
+}
+
+function renderDetalleServicio(s) {
+  const d    = s.detalles || {};
+  const prom = parseFloat(s.promedio_estrellas || 0);
+  const wsMsg = `Hola, requiero tu servicio '${s.titulo}' vengo de la web Workify. ¿Podemos coordinar?`;
+  const wsNum = d.numero_wsp;
+
+  document.querySelector('.panel-header h2').textContent = s.titulo;
+  document.querySelector('.panel-header p').textContent  = s.usuarios?.nombre || 'Profesional';
+
+  const body = `
+    <div style="display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:1.25rem">
+      ${s.destacado     ? '<span class="badge badge-destacado"><i class="fa-solid fa-star" style="font-size:.6rem"></i> Destacado</span>' : ''}
+      ${d.experiencia   ? `<span class="badge badge-teal">${d.experiencia} años exp.</span>` : ''}
+      ${d.precio_aprox  ? `<span class="badge badge-green">S/ ${d.precio_aprox}</span>` : ''}
+    </div>
+    <div class="info-grid" style="margin-bottom:1.25rem">
+      <div class="info-item"><div class="info-item-label">Calificación</div><div class="info-item-value">${renderEstrellas(prom, s.total_calificaciones)}</div></div>
+      <div class="info-item"><div class="info-item-label">Ubicación</div><div class="info-item-value"><i class="fa-solid fa-location-dot" style="color:var(--teal)"></i> ${s.ubicacion || '—'}</div></div>
+      <div class="info-item"><div class="info-item-label">Experiencia</div><div class="info-item-value">${d.experiencia ? d.experiencia + ' años' : '—'}</div></div>
+      <div class="info-item"><div class="info-item-label">Precio aprox.</div><div class="info-item-value">${d.precio_aprox ? 'S/ ' + d.precio_aprox : 'A coordinar'}</div></div>
+    </div>
+    <div class="detail-section">
+      <div class="detail-label">Descripción del servicio</div>
+      <div class="detail-value">${s.descripcion || '—'}</div>
+    </div>
+
+    ${Auth.isLoggedIn() && Auth.user.id !== s.usuario_id ? `
+    <div class="divider-line"></div>
+    <div class="detail-label" style="margin-bottom:.75rem">Deja tu calificación</div>
+    <div id="cal-form">
+      <div style="background:var(--gray-50);border-radius:var(--radius-md);padding:1rem;border:1px solid var(--gray-100)">
+        <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:.75rem">
+          <span style="font-size:.85rem;font-weight:600;color:var(--gray-700)">Tu calificación:</span>
+          <div class="stars-input" id="stars-sel">
+            ${[1,2,3,4,5].map(n => `<button class="star-btn" type="button" onclick="setStar(${s.id},${n})"><i class="fa-regular fa-star"></i></button>`).join('')}
+          </div>
+        </div>
+        <textarea id="cal-comentario" class="form-control" rows="2" placeholder="Comentario opcional..." style="font-size:.85rem;margin-bottom:.75rem"></textarea>
+        <button class="btn btn-teal btn-sm" onclick="enviarCal(${s.id})">
+          <i class="fa-solid fa-star"></i> Enviar calificación
+        </button>
+      </div>
+    </div>` : ''}
+
+    ${s.calificaciones?.length ? `
+    <div class="divider-line"></div>
+    <div class="detail-label" style="margin-bottom:.75rem">Reseñas (${s.calificaciones.length})</div>
+    ${s.calificaciones.slice(0,5).map(c => `
+      <div style="padding:.85rem;background:var(--gray-50);border-radius:var(--radius-md);margin-bottom:.5rem;border:1px solid var(--gray-100)">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.3rem">
+          <span style="font-size:.85rem;font-weight:600">${c.usuarios?.nombre || 'Usuario'}</span>
+          ${renderEstrellas(c.estrellas)}
+        </div>
+        ${c.comentario ? `<p style="font-size:.82rem;color:var(--gray-600)">${c.comentario}</p>` : ''}
+      </div>`).join('')}` : ''}`;
+
+  const footer = wsNum ? `
+    <a href="${urlWhatsApp(wsNum, wsMsg)}" target="_blank" class="btn btn-whatsapp" style="flex:1">
+      <i class="fa-brands fa-whatsapp"></i> Contactar por WhatsApp
+    </a>` : `<p style="font-size:.82rem;color:var(--gray-500)">Sin número de contacto disponible</p>`;
+
+  Panel.open({ title: s.titulo, subtitle: s.usuarios?.nombre || 'Profesional', body, footer });
+}
+
+let selStar = 0;
+function setStar(sid, val) {
+  selStar = val;
+  document.querySelectorAll('#stars-sel .star-btn').forEach((b,i) => {
+    b.querySelector('i').className = i < val ? 'fa-solid fa-star' : 'fa-regular fa-star';
+    b.classList.toggle('active', i < val);
+  });
+}
+
+async function enviarCal(sId) {
+  if (!selStar) { Toast.warning('Selecciona una calificación'); return; }
+  const comentario = document.getElementById('cal-comentario')?.value;
+  try {
+    await api.post('/api/publicaciones/calificaciones', { servicio_id: sId, estrellas: selStar, comentario });
+    document.getElementById('cal-form').innerHTML = `
+      <div class="success-box d-flex align-center gap-2">
+        <i class="fa-solid fa-circle-check" style="color:var(--success)"></i>
+        <span style="font-size:.88rem">¡Gracias por tu calificación!</span>
+      </div>`;
+    Toast.success('Calificación registrada');
+  } catch (err) { Toast.error(err.message); }
+}
+</script>
+</body>
+</html>

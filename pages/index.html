@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Workify — Encuentra trabajo o contrata talento</title>
+  <meta name="description" content="Conectamos empleadores con trabajadores independientes. Gasfiteros, pintores, electricistas, tecnología y más.">
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    .how-it-works { background: var(--white); }
+    .step-card {
+      text-align: center;
+      padding: 2rem 1.5rem;
+    }
+    .step-icon {
+      width: 68px; height: 68px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.6rem;
+      margin: 0 auto 1.25rem;
+    }
+    .step-number {
+      font-family: var(--font-head);
+      font-size: .7rem;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      margin-bottom: .5rem;
+    }
+    .stats-bar {
+      background: rgba(255, 255, 255, 0);
+      padding: 1.75rem 0;
+    }
+    .stat-item { text-align: center; }
+    .stat-num {
+      font-family: var(--font-head);
+      font-size: 1.9rem;
+      font-weight: 800;
+      color: var(--teal);
+      line-height: 1;
+      margin-bottom: .2rem;
+    }
+    .stat-label { font-size: .82rem; color: rgba(0, 0, 0, 0.6); }
+    .categories-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      gap: 1rem;
+    }
+    .cat-card {
+      background: var(--white);
+      border-radius: var(--radius-lg);
+      padding: 1.25rem .75rem;
+      text-align: center;
+      cursor: pointer;
+      border: 1.5px solid var(--gray-100);
+      transition: var(--transition-slow);
+    }
+    .cat-card:hover {
+      border-color: var(--blue);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+    .cat-card i {
+      font-size: 1.5rem;
+      margin-bottom: .5rem;
+      color: var(--blue);
+    }
+    .cat-card span {
+      font-size: .8rem;
+      font-weight: 600;
+      color: var(--gray-700);
+    }
+    .featured-section { background: var(--gray-50); }
+  </style>
+</head>
+<body>
+
+<!-- ═══ NAVBAR ═══════════════════════════════════════════════ -->
+<nav class="navbar" id="main-nav">
+  <a href="/" class="navbar-brand">
+    Chambealo<span class="brand-dot"></span>
+  </a>
+
+  <div class="navbar-nav">
+    <a href="/pages/index.html" class="nav-link active"><i class="fa-solid fa-house fa-sm"></i> Inicio</a>
+    <a href="/pages/ofertas.html" class="nav-link"><i class="fa-solid fa-briefcase fa-sm"></i> Ofertas</a>
+    <a href="/pages/servicios.html" class="nav-link"><i class="fa-solid fa-wrench fa-sm"></i> Servicios</a>
+  </div>
+
+  <div class="navbar-actions">
+    <button class="notif-btn" id="nav-notif-btn" onclick="openNotificaciones()" style="display:none">
+      <i class="fa-regular fa-bell"></i>
+      <span class="notif-badge" id="notif-count" style="display:none">0</span>
+    </button>
+
+    <a href="/pages/publicar.html" class="btn btn-teal btn-sm" id="nav-publicar-btn" style="display:none">
+      <i class="fa-solid fa-plus"></i> Publicar
+    </a>
+
+    <a href="/pages/perfil.html" class="btn btn-outline btn-sm" id="nav-perfil-btn"
+       style="display:none;background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.2);color:white">
+      <i class="fa-solid fa-user"></i> Mi perfil
+    </a>
+
+    <a href="/pages/admin.html" class="btn btn-sm" id="nav-admin-btn"
+       style="display:none;background:rgba(245,158,11,.15);color:#f59e0b;border:1px solid rgba(245,158,11,.3)">
+      <i class="fa-solid fa-shield"></i> Admin
+    </a>
+
+    <button class="btn btn-primary btn-sm" id="nav-auth-btn" onclick="openAuthModal()">
+      <i class="fa-solid fa-arrow-right-to-bracket"></i> Ingresar
+    </button>
+  </div>
+</nav>
+
+<!-- ═══ HERO ════════════════════════════════════════════════ -->
+<section class="hero">
+  <!-- El video de fondo -->
+  <video class="hero-video" autoplay loop muted playsinline>
+    <source src="/videofondo.mp4" type="video/mp4">
+  </video>
+  <div class="hero-content">
+    <div style="display:inline-flex;align-items:center;gap:.5rem;background:rgba(0,188,212,.15);border:1px solid rgba(0,188,212,.3);border-radius:var(--radius-full);padding:.3rem .9rem;margin-bottom:1.25rem">
+      <i class="fa-solid fa-bolt" style="color:var(--teal);font-size:.8rem"></i>
+      <span style="font-size:.8rem;color:rgba(255,255,255,.8);font-weight:500">La plataforma laboral del Perú</span>
+    </div>
+    <h1>Conecta con el <span>talento</span><br>que tu proyecto necesita</h1>
+    <p>Encuentra gasfiteros, electricistas, pintores, profesionales independientes y más. O publica tu oferta y recibe postulaciones hoy.</p>
+
+    <div class="hero-search">
+      <select id="hero-tipo">
+        <option value="">Todo</option>
+        <option value="oferta">Ofertas</option>
+        <option value="servicio">Servicios</option>
+      </select>
+      <select id="hero-categoria">
+        <option value="">Categoría</option>
+        <option value="construccion">Construcción</option>
+        <option value="electricidad">Electricidad</option>
+        <option value="pintura">Pintura</option>
+        <option value="fontaneria">Fontanería</option>
+        <option value="tecnologia">Tecnología</option>
+        <option value="otros">Otros</option>
+      </select>
+      <input type="text" id="hero-q" placeholder="Buscar por título, habilidad..." />
+      <button class="btn btn-primary" onclick="buscarHero()">
+        <i class="fa-solid fa-magnifying-glass"></i> Buscar
+      </button>
+    </div>
+
+    <div class="hero-tabs">
+      <span class="hero-tab active" onclick="filterHero('oferta', this)">
+        <i class="fa-solid fa-briefcase"></i> Ofertas laborales
+      </span>
+      <span class="hero-tab" onclick="filterHero('servicio', this)">
+        <i class="fa-solid fa-wrench"></i> Servicios independientes
+      </span>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ STATS ════════════════════════════════════════════════ -->
+<div class="stats-bar">
+  <div class="container">
+    <div class="grid-4" id="stats-grid">
+      <div class="stat-item"><div class="stat-num" id="stat-ofertas">—</div><div class="stat-label">Ofertas activas</div></div>
+      <div class="stat-item"><div class="stat-num" id="stat-servicios">—</div><div class="stat-label">Servicios disponibles</div></div>
+      <div class="stat-item"><div class="stat-num" id="stat-usuarios">—</div><div class="stat-label">Profesionales registrados</div></div>
+      <div class="stat-item"><div class="stat-num" id="stat-postulaciones">—</div><div class="stat-label">Conexiones realizadas</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ CATEGORÍAS ════════════════════════════════════════════ -->
+<section class="section">
+  <div class="container">
+    <div class="d-flex align-center justify-between mb-2">
+      <div>
+        <h2 class="section-title">Explora por categoría</h2>
+        <p class="section-subtitle">Encuentra exactamente lo que necesitas</p>
+      </div>
+    </div>
+    <div class="categories-grid">
+      <div class="cat-card" onclick="irCategoria('construccion')">
+        <i class="fa-solid fa-hard-hat"></i><span>Construcción</span>
+      </div>
+      <div class="cat-card" onclick="irCategoria('electricidad')">
+        <i class="fa-solid fa-bolt"></i><span>Electricidad</span>
+      </div>
+      <div class="cat-card" onclick="irCategoria('pintura')">
+        <i class="fa-solid fa-paint-roller"></i><span>Pintura</span>
+      </div>
+      <div class="cat-card" onclick="irCategoria('fontaneria')">
+        <i class="fa-solid fa-faucet"></i><span>Fontanería</span>
+      </div>
+      <div class="cat-card" onclick="irCategoria('tecnologia')">
+        <i class="fa-solid fa-laptop-code"></i><span>Tecnología</span>
+      </div>
+      <div class="cat-card" onclick="irCategoria('otros')">
+        <i class="fa-solid fa-toolbox"></i><span>Otros</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ OFERTAS DESTACADAS ════════════════════════════════════ -->
+<section class="section featured-section">
+  <div class="container">
+    <div class="d-flex align-center justify-between mb-2">
+      <div>
+        <h2 class="section-title">Ofertas destacadas</h2>
+        <p class="section-subtitle">Las mejores oportunidades laborales del momento</p>
+      </div>
+      <a href="/pages/ofertas.html" class="btn btn-outline btn-sm">
+        Ver todas <i class="fa-solid fa-arrow-right"></i>
+      </a>
+    </div>
+    <div class="grid-3" id="ofertas-destacadas">
+      <div class="loading-overlay" style="grid-column:1/-1">
+        <span class="spinner dark"></span><span>Cargando ofertas...</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ SERVICIOS DESTACADOS ══════════════════════════════════ -->
+<section class="section">
+  <div class="container">
+    <div class="d-flex align-center justify-between mb-2">
+      <div>
+        <h2 class="section-title">Servicios independientes</h2>
+        <p class="section-subtitle">Profesionales listos para ayudarte</p>
+      </div>
+      <a href="/pages/servicios.html" class="btn btn-outline btn-sm">
+        Ver todos <i class="fa-solid fa-arrow-right"></i>
+      </a>
+    </div>
+    <div class="grid-3" id="servicios-destacados">
+      <div class="loading-overlay" style="grid-column:1/-1">
+        <span class="spinner dark"></span><span>Cargando servicios...</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ CÓMO FUNCIONA ════════════════════════════════════════ -->
+<section class="section how-it-works">
+  <div class="container">
+    <div class="text-center mb-3">
+      <h2 class="section-title">¿Cómo funciona?</h2>
+      <p class="section-subtitle">Simple, rápido y seguro</p>
+    </div>
+    <div class="grid-4">
+      <div class="step-card fade-up fade-up-1">
+        <div class="step-icon" style="background:rgba(33,150,243,.1)">
+          <i class="fa-solid fa-user-plus" style="color:var(--blue)"></i>
+        </div>
+        <div class="step-number" style="color:var(--blue)">Paso 01</div>
+        <h3 style="font-size:1rem;margin-bottom:.5rem">Crea tu cuenta</h3>
+        <p style="font-size:.85rem;color:var(--gray-500);line-height:1.6">Regístrate gratis con tu correo y número de WhatsApp.</p>
+      </div>
+      <div class="step-card fade-up fade-up-2">
+        <div class="step-icon" style="background:rgba(0,188,212,.1)">
+          <i class="fa-solid fa-file-circle-plus" style="color:var(--teal)"></i>
+        </div>
+        <div class="step-number" style="color:var(--teal)">Paso 02</div>
+        <h3 style="font-size:1rem;margin-bottom:.5rem">Publica o postula</h3>
+        <p style="font-size:.85rem;color:var(--gray-500);line-height:1.6">Publica tu oferta o servicio, o postula a los disponibles.</p>
+      </div>
+      <div class="step-card fade-up fade-up-3">
+        <div class="step-icon" style="background:rgba(245,158,11,.1)">
+          <i class="fa-solid fa-circle-check" style="color:#f59e0b"></i>
+        </div>
+        <div class="step-number" style="color:#f59e0b">Paso 03</div>
+        <h3 style="font-size:1rem;margin-bottom:.5rem">Confirma el pago</h3>
+        <p style="font-size:.85rem;color:var(--gray-500);line-height:1.6">Paga el plan elegido por WhatsApp y el admin verifica.</p>
+      </div>
+      <div class="step-card fade-up fade-up-4">
+        <div class="step-icon" style="background:rgba(16,185,129,.1)">
+          <i class="fa-solid fa-handshake" style="color:var(--success)"></i>
+        </div>
+        <div class="step-number" style="color:var(--success)">Paso 04</div>
+        <h3 style="font-size:1rem;margin-bottom:.5rem">¡Conecta!</h3>
+        <p style="font-size:.85rem;color:var(--gray-500);line-height:1.6">Tu publicación va en línea y las conexiones comienzan.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ CTA ═══════════════════════════════════════════════════ -->
+<section class="section" style="background:linear-gradient(135deg,var(--navy-dark),var(--navy-mid));padding:4rem 0">
+  <div class="container text-center">
+    <h2 style="color:white;font-size:1.9rem;margin-bottom:.75rem;letter-spacing:-.02em">
+      ¿Listo para empezar?
+    </h2>
+    <p style="color:rgba(255,255,255,.65);max-width:400px;margin:0 auto 2rem;font-size:1rem">
+      Únete a cientos de profesionales y empleadores en Workify.
+    </p>
+    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+      <button class="btn btn-teal btn-lg" onclick="openAuthModal('register')">
+        <i class="fa-solid fa-rocket"></i> Crear cuenta gratis
+      </button>
+      <a href="/pages/ofertas.html" class="btn btn-lg" style="background:rgba(255,255,255,.1);color:white;border:1.5px solid rgba(255,255,255,.2)">
+        Ver ofertas disponibles
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ FOOTER ════════════════════════════════════════════════ -->
+<footer>
+  <div class="footer-content">
+    <div>
+      <div class="footer-brand">Workify<span style="color:var(--teal)">.</span></div>
+      <p style="font-size:.85rem;max-width:260px;line-height:1.6">Conectamos el talento peruano con las oportunidades que merecen.</p>
+    </div>
+    <div>
+      <p style="font-size:.8rem;font-weight:600;color:rgba(255,255,255,.9);margin-bottom:.75rem;text-transform:uppercase;letter-spacing:.06em">Explorar</p>
+      <div style="display:flex;flex-direction:column;gap:.4rem">
+        <a href="/pages/ofertas.html" style="font-size:.85rem;color:rgba(255,255,255,.6);transition:var(--transition)" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,.6)'">Ofertas laborales</a>
+        <a href="/pages/servicios.html" style="font-size:.85rem;color:rgba(255,255,255,.6);transition:var(--transition)" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,.6)'">Servicios independientes</a>
+        <a href="/pages/publicar.html" style="font-size:.85rem;color:rgba(255,255,255,.6);transition:var(--transition)" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,.6)'">Publicar</a>
+      </div>
+    </div>
+    <div>
+      <p style="font-size:.8rem;font-weight:600;color:rgba(255,255,255,.9);margin-bottom:.75rem;text-transform:uppercase;letter-spacing:.06em">Cuenta</p>
+      <div style="display:flex;flex-direction:column;gap:.4rem">
+        <a onclick="openAuthModal('register')" style="font-size:.85rem;color:rgba(255,255,255,.6);cursor:pointer;transition:var(--transition)" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,.6)'">Registrarse</a>
+        <a onclick="openAuthModal('login')" style="font-size:.85rem;color:rgba(255,255,255,.6);cursor:pointer;transition:var(--transition)" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,.6)'">Iniciar sesión</a>
+        <a href="/pages/perfil.html" style="font-size:.85rem;color:rgba(255,255,255,.6);transition:var(--transition)" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,.6)'">Mi perfil</a>
+      </div>
+    </div>
+  </div>
+  <div class="footer-copy">
+    © 2025 Workify — Plataforma laboral peruana. Todos los derechos reservados.
+  </div>
+</footer>
+
+<script src="/js/core.js"></script>
+<script>
+// ── Cargar datos del home ────────────────────────────────────
+async function loadHomeData() {
+  try {
+    // Cargar ofertas y servicios en paralelo
+    const [ofertasRes, serviciosRes] = await Promise.all([
+      api.get('/api/publicaciones?tipo=oferta&destacado=true&limit=3'),
+      api.get('/api/publicaciones?tipo=servicio&destacado=true&limit=3')
+    ]);
+
+    renderOfertasDestacadas(ofertasRes.publicaciones || []);
+    renderServiciosDestacados(serviciosRes.publicaciones || []);
+
+    // Stats
+    document.getElementById('stat-ofertas').textContent     = ofertasRes.total || '—';
+    document.getElementById('stat-servicios').textContent   = serviciosRes.total || '—';
+    document.getElementById('stat-usuarios').textContent    = '100+';
+    document.getElementById('stat-postulaciones').textContent = '500+';
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+function renderOfertasDestacadas(ofertas) {
+  const el = document.getElementById('ofertas-destacadas');
+  if (!ofertas.length) {
+    el.innerHTML = `<div class="empty-state" style="grid-column:1/-1">
+      <i class="fa-solid fa-briefcase"></i><h3>Aún no hay ofertas</h3>
+      <p>Sé el primero en publicar una oferta laboral.</p>
+    </div>`;
+    return;
+  }
+  el.innerHTML = ofertas.map(oferta => renderOfertaCard(oferta)).join('');
+}
+
+function renderServiciosDestacados(servicios) {
+  const el = document.getElementById('servicios-destacados');
+  if (!servicios.length) {
+    el.innerHTML = `<div class="empty-state" style="grid-column:1/-1">
+      <i class="fa-solid fa-wrench"></i><h3>Aún no hay servicios</h3>
+      <p>Sé el primero en publicar tu servicio.</p>
+    </div>`;
+    return;
+  }
+  el.innerHTML = servicios.map(s => renderServicioCard(s)).join('');
+}
+
+function renderOfertaCard(o) {
+  const detalles = o.detalles || {};
+  const dias = diasRestantes(o.fecha_fin);
+  return `
+    <div class="job-card fade-up" onclick="verDetalle(${o.id}, 'oferta')">
+      ${o.destacado ? '<span class="badge badge-destacado" style="position:absolute;top:.75rem;right:.75rem"><i class="fa-solid fa-star" style="font-size:.6rem"></i> Destacado</span>' : ''}
+      <div style="display:flex;align-items:flex-start;gap:.75rem;margin-bottom:.75rem">
+        <div style="width:42px;height:42px;background:rgba(33,150,243,.1);border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <i class="fa-solid fa-briefcase" style="color:var(--blue);font-size:1rem"></i>
+        </div>
+        <div>
+          <h3 style="font-size:.95rem;font-weight:700;color:var(--navy);line-height:1.3;margin-bottom:.2rem">${o.titulo}</h3>
+          <p style="font-size:.78rem;color:var(--gray-500)">${o.usuarios?.nombre || 'Empresa'}</p>
+        </div>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:.35rem;margin-bottom:.85rem">
+        ${detalles.categoria ? `<span class="badge badge-navy">${detalles.categoria}</span>` : ''}
+        ${detalles.modalidad ? `<span class="badge badge-blue">${detalles.modalidad}</span>` : ''}
+        ${detalles.tipo_contrato ? `<span class="badge badge-gray">${detalles.tipo_contrato}</span>` : ''}
+      </div>
+      <div style="display:flex;align-items:center;gap:1rem;font-size:.78rem;color:var(--gray-500)">
+        <span><i class="fa-solid fa-location-dot fa-sm" style="margin-right:.25rem"></i>${o.ubicacion || '—'}</span>
+        <span style="margin-left:auto;color:${dias <= 3 ? 'var(--danger)' : 'var(--gray-400)'}">
+          <i class="fa-regular fa-clock fa-sm"></i> ${dias > 0 ? `${dias}d restantes` : 'Vence hoy'}
+        </span>
+      </div>
+    </div>
+  `;
+}
+
+function renderServicioCard(s) {
+  const detalles = s.detalles || {};
+  const prom = s.promedio_estrellas || 0;
+  const total = s.total_calificaciones || 0;
+  return `
+    <div class="job-card service-card fade-up" onclick="verDetalle(${s.id}, 'servicio')">
+      ${s.destacado ? '<span class="badge badge-destacado" style="position:absolute;top:.75rem;right:.75rem"><i class="fa-solid fa-star" style="font-size:.6rem"></i> Destacado</span>' : ''}
+      <div style="display:flex;align-items:flex-start;gap:.75rem;margin-bottom:.75rem">
+        <div style="width:42px;height:42px;background:rgba(0,188,212,.1);border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <i class="fa-solid fa-wrench" style="color:var(--teal);font-size:1rem"></i>
+        </div>
+        <div>
+          <h3 style="font-size:.95rem;font-weight:700;color:var(--navy);line-height:1.3;margin-bottom:.2rem">${s.titulo}</h3>
+          <p style="font-size:.78rem;color:var(--gray-500)">${s.usuarios?.nombre || 'Profesional'}</p>
+        </div>
+      </div>
+      <div style="margin-bottom:.75rem">
+        ${renderEstrellas(prom, total)}
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:.35rem;margin-bottom:.85rem">
+        ${detalles.experiencia ? `<span class="badge badge-teal">${detalles.experiencia} años exp.</span>` : ''}
+        ${detalles.precio_aprox ? `<span class="badge badge-green">${detalles.precio_aprox}</span>` : ''}
+      </div>
+      <div style="font-size:.78rem;color:var(--gray-500)">
+        <i class="fa-solid fa-location-dot fa-sm" style="margin-right:.25rem"></i>${s.ubicacion || '—'}
+      </div>
+    </div>
+  `;
+}
+
+function irCategoria(cat) {
+  const tipo = document.getElementById('hero-tipo').value || 'oferta';
+  window.location.href = `/pages/ofertas.html?categoria=${cat}`;
+}
+
+function buscarHero() {
+  const q    = document.getElementById('hero-q').value;
+  const tipo = document.getElementById('hero-tipo').value;
+  const cat  = document.getElementById('hero-categoria').value;
+  const destino = tipo === 'servicio' ? '/pages/servicios.html' : '/pages/ofertas.html';
+  const params = new URLSearchParams();
+  if (q)   params.set('q', q);
+  if (cat) params.set('categoria', cat);
+  window.location.href = `${destino}?${params.toString()}`;
+}
+
+function filterHero(tipo, el) {
+  document.querySelectorAll('.hero-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('hero-tipo').value = tipo;
+}
+
+// Ver detalle: abrir panel
+async function verDetalle(id, tipo) {
+  Panel.open({
+    title: 'Cargando...',
+    subtitle: '',
+    body: '<div class="loading-overlay"><span class="spinner dark"></span>Cargando detalles...</div>'
+  });
+
+  try {
+    const pub = await api.get(`/api/publicaciones/${id}`);
+    if (tipo === 'oferta') renderDetalleOferta(pub);
+    else renderDetalleServicio(pub);
+  } catch {
+    Panel.setBody('<div class="empty-state"><i class="fa-solid fa-circle-exclamation"></i><h3>Error al cargar</h3></div>');
+  }
+}
+
+function renderDetalleOferta(o) {
+  const d = o.detalles || {};
+  const dias = diasRestantes(o.fecha_fin);
+  const wsMsg = `Hola, me interesa tu oferta "${o.titulo}". Vi tu publicación en Workify.`;
+  const wsNum = d.telefono_contacto || o.usuarios?.whatsapp;
+
+  // Actualizar header del panel
+  document.querySelector('.panel-header h2').textContent = o.titulo;
+  document.querySelector('.panel-header p').textContent = o.usuarios?.nombre || 'Empresa';
+
+  const body = `
+    <div style="display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:1.25rem">
+      ${o.destacado ? '<span class="badge badge-destacado"><i class="fa-solid fa-star" style="font-size:.6rem"></i> Destacado</span>' : ''}
+      ${d.categoria ? `<span class="badge badge-navy">${d.categoria}</span>` : ''}
+      ${d.modalidad ? `<span class="badge badge-blue">${d.modalidad}</span>` : ''}
+      ${d.tipo_contrato ? `<span class="badge badge-gray">${d.tipo_contrato}</span>` : ''}
+      <span class="badge ${dias <= 3 ? 'badge-red' : 'badge-gray'}">${dias > 0 ? `Vence en ${dias} días` : 'Vence hoy'}</span>
+    </div>
+
+    <div class="info-grid" style="margin-bottom:1.25rem">
+      <div class="info-item"><div class="info-item-label">Ubicación</div><div class="info-item-value"><i class="fa-solid fa-location-dot" style="color:var(--blue)"></i> ${o.ubicacion || '—'}</div></div>
+      <div class="info-item"><div class="info-item-label">Modalidad</div><div class="info-item-value">${d.modalidad || '—'}</div></div>
+      <div class="info-item"><div class="info-item-label">Tipo contrato</div><div class="info-item-value">${d.tipo_contrato || '—'}</div></div>
+      <div class="info-item"><div class="info-item-label">Publicado por</div><div class="info-item-value">${o.usuarios?.nombre || '—'}</div></div>
+    </div>
+
+    <div class="detail-section">
+      <div class="detail-label">Descripción del puesto</div>
+      <div class="detail-value">${o.descripcion || 'Sin descripción'}</div>
+    </div>
+
+    ${d.requisitos ? `
+    <div class="detail-section">
+      <div class="detail-label">Requisitos</div>
+      <div class="detail-value">${d.requisitos}</div>
+    </div>` : ''}
+
+    ${d.email_contacto || d.telefono_contacto ? `
+    <div class="detail-section">
+      <div class="detail-label">Contacto del empleador</div>
+      <div class="detail-value">
+        ${d.email_contacto ? `<div><i class="fa-solid fa-envelope" style="color:var(--gray-400);margin-right:.4rem"></i>${d.email_contacto}</div>` : ''}
+        ${d.telefono_contacto ? `<div><i class="fa-solid fa-phone" style="color:var(--gray-400);margin-right:.4rem"></i>${d.telefono_contacto}</div>` : ''}
+      </div>
+    </div>` : ''}
+
+    ${Auth.isLoggedIn() ? `
+    <div class="divider-line"></div>
+    <div class="detail-label" style="margin-bottom:.75rem">Postular a esta oferta</div>
+    ${Auth.user.cv_url ? `
+      <div class="highlight-box d-flex align-center gap-2" style="margin-bottom:1rem">
+        <i class="fa-solid fa-file-pdf" style="color:var(--blue)"></i>
+        <div>
+          <div style="font-size:.85rem;font-weight:600">Tu CV está listo</div>
+          <a href="${Auth.user.cv_url}" target="_blank" style="font-size:.78rem;color:var(--blue)">Ver mi CV <i class="fa-solid fa-external-link-alt fa-xs"></i></a>
+        </div>
+      </div>
+      <button class="btn btn-primary w-100" onclick="confirmarPostular(${o.id}, '${o.titulo.replace(/'/g, "\\'")}')">
+        <i class="fa-solid fa-paper-plane"></i> Enviar postulación
+      </button>
+    ` : `
+      <div class="warning-box d-flex align-center gap-2">
+        <i class="fa-solid fa-triangle-exclamation" style="color:#f59e0b"></i>
+        <div>
+          <div style="font-size:.85rem;font-weight:600">CV requerido</div>
+          <p style="font-size:.78rem;color:var(--gray-600)">Debes subir tu CV antes de postularte.</p>
+          <a href="/pages/perfil.html" class="btn btn-sm btn-outline mt-1">Subir CV</a>
+        </div>
+      </div>
+    `}
+    ` : `
+    <div class="divider-line"></div>
+    <div class="highlight-box text-center">
+      <p style="font-size:.88rem;color:var(--gray-600);margin-bottom:.75rem">Inicia sesión para postularte a esta oferta</p>
+      <button class="btn btn-primary" onclick="openAuthModal()">Ingresar / Registrarse</button>
+    </div>
+    `}
+  `;
+
+  const footer = wsNum ? `
+    <a href="${urlWhatsApp(wsNum, wsMsg)}" target="_blank" class="btn btn-whatsapp">
+      <i class="fa-brands fa-whatsapp"></i> Mensaje a la empresa
+    </a>
+  ` : '';
+
+  Panel.setBody(body);
+  const footerEl = document.querySelector('.panel-footer');
+  if (footerEl) footerEl.innerHTML = footer;
+}
+
+function renderDetalleServicio(s) {
+  const d = s.detalles || {};
+  const prom = parseFloat(s.promedio_estrellas || 0);
+  const wsMsg = `Hola, requiero tu servicio '${s.titulo}' vengo de la web Workify. ¿Podemos coordinar?`;
+  const wsNum = d.numero_wsp;
+
+  document.querySelector('.panel-header h2').textContent = s.titulo;
+  document.querySelector('.panel-header p').textContent = s.usuarios?.nombre || 'Profesional';
+
+  const body = `
+    <div style="display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:1.25rem">
+      ${s.destacado ? '<span class="badge badge-destacado"><i class="fa-solid fa-star" style="font-size:.6rem"></i> Destacado</span>' : ''}
+      ${d.experiencia ? `<span class="badge badge-teal">${d.experiencia} años de experiencia</span>` : ''}
+      ${d.precio_aprox ? `<span class="badge badge-green">Desde ${d.precio_aprox}</span>` : ''}
+    </div>
+
+    <div class="info-grid" style="margin-bottom:1.25rem">
+      <div class="info-item"><div class="info-item-label">Calificación</div><div class="info-item-value">${renderEstrellas(prom, s.total_calificaciones)}</div></div>
+      <div class="info-item"><div class="info-item-label">Ubicación</div><div class="info-item-value"><i class="fa-solid fa-location-dot" style="color:var(--teal)"></i> ${s.ubicacion || '—'}</div></div>
+      <div class="info-item"><div class="info-item-label">Experiencia</div><div class="info-item-value">${d.experiencia ? `${d.experiencia} años` : '—'}</div></div>
+      <div class="info-item"><div class="info-item-label">Precio aprox.</div><div class="info-item-value">${d.precio_aprox || 'A coordinar'}</div></div>
+    </div>
+
+    <div class="detail-section">
+      <div class="detail-label">Descripción del servicio</div>
+      <div class="detail-value">${s.descripcion || 'Sin descripción'}</div>
+    </div>
+
+    ${Auth.isLoggedIn() && Auth.user.id !== s.usuario_id ? `
+    <div class="divider-line"></div>
+    <div class="detail-label" style="margin-bottom:.75rem">Calificar este servicio</div>
+    <div id="calificacion-form">
+      ${renderFormCalificacion(s.id)}
+    </div>` : ''}
+
+    ${s.calificaciones && s.calificaciones.length > 0 ? `
+    <div class="divider-line"></div>
+    <div class="detail-label" style="margin-bottom:.75rem">Reseñas (${s.calificaciones.length})</div>
+    ${s.calificaciones.slice(0, 5).map(c => `
+      <div style="padding:.85rem;background:var(--gray-50);border-radius:var(--radius-md);margin-bottom:.5rem;border:1px solid var(--gray-100)">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.4rem">
+          <span style="font-size:.85rem;font-weight:600">${c.usuarios?.nombre || 'Usuario'}</span>
+          ${renderEstrellas(c.estrellas)}
+        </div>
+        ${c.comentario ? `<p style="font-size:.82rem;color:var(--gray-600)">${c.comentario}</p>` : ''}
+      </div>
+    `).join('')}` : ''}
+  `;
+
+  const footer = wsNum ? `
+    <a href="${urlWhatsApp(wsNum, wsMsg)}" target="_blank" class="btn btn-whatsapp">
+      <i class="fa-brands fa-whatsapp"></i> Contactar por WhatsApp
+    </a>
+  ` : '';
+
+  Panel.setBody(body);
+  const footerEl = document.querySelector('.panel-footer');
+  if (footerEl) footerEl.innerHTML = footer;
+}
+
+function renderFormCalificacion(servicioId) {
+  return `
+    <div style="background:var(--gray-50);border-radius:var(--radius-md);padding:1rem;border:1px solid var(--gray-100)">
+      <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:.75rem">
+        <span style="font-size:.85rem;font-weight:600;color:var(--gray-700)">Tu calificación:</span>
+        <div class="stars-input" id="stars-input-${servicioId}">
+          ${[1,2,3,4,5].map(n => `
+            <button class="star-btn" type="button" data-val="${n}"
+              onclick="setStars(${servicioId}, ${n})">
+              <i class="fa-regular fa-star"></i>
+            </button>
+          `).join('')}
+        </div>
+      </div>
+      <textarea id="comentario-${servicioId}" class="form-control" rows="2"
+        placeholder="Comentario opcional..." style="font-size:.85rem;margin-bottom:.75rem"></textarea>
+      <button class="btn btn-teal btn-sm" onclick="enviarCalificacion(${servicioId})">
+        <i class="fa-solid fa-star"></i> Enviar calificación
+      </button>
+    </div>
+  `;
+}
+
+let starValues = {};
+
+function setStars(id, val) {
+  starValues[id] = val;
+  const container = document.getElementById(`stars-input-${id}`);
+  if (!container) return;
+  container.querySelectorAll('.star-btn').forEach((btn, i) => {
+    const icon = btn.querySelector('i');
+    if (i < val) {
+      icon.className = 'fa-solid fa-star';
+      btn.classList.add('active');
+    } else {
+      icon.className = 'fa-regular fa-star';
+      btn.classList.remove('active');
+    }
+  });
+}
+
+async function enviarCalificacion(servicioId) {
+  const estrellas = starValues[servicioId];
+  if (!estrellas) { Toast.warning('Por favor selecciona una calificación'); return; }
+
+  const comentario = document.getElementById(`comentario-${servicioId}`)?.value;
+
+  try {
+    await api.post('/api/publicaciones/calificaciones', {
+      servicio_id: servicioId,
+      estrellas,
+      comentario: comentario || null
+    });
+
+    document.getElementById('calificacion-form').innerHTML = `
+      <div class="success-box d-flex align-center gap-2">
+        <i class="fa-solid fa-circle-check" style="color:var(--success)"></i>
+        <span style="font-size:.88rem">¡Gracias por tu calificación!</span>
+      </div>
+    `;
+    Toast.success('Calificación registrada');
+  } catch (err) {
+    Toast.error(err.message);
+  }
+}
+
+async function confirmarPostular(ofertaId, titulo) {
+  confirmDialog(
+    `¿Confirmas tu postulación a "${titulo}"? Se enviará tu CV al empleador.`,
+    async () => {
+      try {
+        await api.post('/api/postulaciones', { oferta_id: ofertaId });
+        Toast.success('¡Postulación enviada! El empleador se pondrá en contacto.');
+        Panel.close();
+      } catch (err) {
+        Toast.error(err.message);
+      }
+    },
+    '¿Deseas postularte?'
+  );
+}
+
+loadHomeData();
+</script>
+</body>
+</html>

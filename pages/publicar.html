@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Publicar — Workify</title>
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    .type-card {
+      border: 2px solid var(--gray-200);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      cursor: pointer;
+      transition: var(--transition-slow);
+      text-align: center;
+    }
+    .type-card:hover { border-color: var(--blue-light); box-shadow: var(--shadow-md); }
+    .type-card.selected {
+      border-color: var(--blue);
+      background: rgba(33,150,243,.04);
+      box-shadow: 0 0 0 3px rgba(33,150,243,.1), var(--shadow-md);
+    }
+    .type-card .icon {
+      width: 64px; height: 64px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.5rem;
+      margin: 0 auto 1rem;
+    }
+    .step-content { display: none; }
+    .step-content.active { display: block; }
+  </style>
+</head>
+<body>
+
+<nav class="navbar" id="main-nav">
+  <a href="/" class="navbar-brand">Workify<span class="brand-dot"></span></a>
+  <div class="navbar-nav">
+    <a href="/pages/index.html" class="nav-link"><i class="fa-solid fa-house fa-sm"></i> Inicio</a>
+    <a href="/pages/ofertas.html" class="nav-link"><i class="fa-solid fa-briefcase fa-sm"></i> Ofertas</a>
+    <a href="/pages/servicios.html" class="nav-link"><i class="fa-solid fa-wrench fa-sm"></i> Servicios</a>
+  </div>
+  <div class="navbar-actions">
+    <button class="notif-btn" id="nav-notif-btn" onclick="openNotificaciones()" style="display:none">
+      <i class="fa-regular fa-bell"></i>
+      <span class="notif-badge" id="notif-count" style="display:none">0</span>
+    </button>
+    <a href="/pages/publicar.html" class="btn btn-teal btn-sm" id="nav-publicar-btn" style="display:none"><i class="fa-solid fa-plus"></i> Publicar</a>
+    <a href="/pages/perfil.html" class="btn btn-outline btn-sm" id="nav-perfil-btn"
+       style="display:none;background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.2);color:white"><i class="fa-solid fa-user"></i> Mi perfil</a>
+    <a href="/pages/admin.html" class="btn btn-sm" id="nav-admin-btn"
+       style="display:none;background:rgba(245,158,11,.15);color:#f59e0b;border:1px solid rgba(245,158,11,.3)"><i class="fa-solid fa-shield"></i> Admin</a>
+    <button class="btn btn-primary btn-sm" id="nav-auth-btn" onclick="openAuthModal()"><i class="fa-solid fa-arrow-right-to-bracket"></i> Ingresar</button>
+  </div>
+</nav>
+
+<div style="background:linear-gradient(135deg,var(--navy-dark),var(--navy));padding:2.5rem 1.5rem 2rem">
+  <div class="container">
+    <h1 style="font-size:1.6rem;color:white;margin-bottom:.4rem">Publicar en Workify</h1>
+    <p style="color:rgba(255,255,255,.6);font-size:.92rem">Sigue los pasos para crear tu publicación</p>
+  </div>
+</div>
+
+<div class="container" style="max-width:760px;padding:2rem 1.5rem">
+
+  <!-- Steps indicator -->
+  <div class="publish-steps" id="steps-bar">
+    <div class="publish-step active" id="step-ind-1">
+      <div class="step-circle">1</div>
+      <div class="step-label">Tipo y plan</div>
+    </div>
+    <div class="step-line" id="line-1"></div>
+    <div class="publish-step" id="step-ind-2">
+      <div class="step-circle">2</div>
+      <div class="step-label">Confirmar pago</div>
+    </div>
+    <div class="step-line" id="line-2"></div>
+    <div class="publish-step" id="step-ind-3">
+      <div class="step-circle">3</div>
+      <div class="step-label">Esperar verificación</div>
+    </div>
+    <div class="step-line" id="line-3"></div>
+    <div class="publish-step" id="step-ind-4">
+      <div class="step-circle">4</div>
+      <div class="step-label">Completar datos</div>
+    </div>
+  </div>
+
+  <!-- STEP 1: Tipo y plan -->
+  <div class="step-content active card" id="step-1">
+    <div class="card-header">
+      <span class="card-title"><i class="fa-solid fa-layer-group" style="color:var(--blue);margin-right:.5rem"></i>Elige el tipo de publicación</span>
+    </div>
+    <div class="card-body">
+      <div class="grid-2" style="margin-bottom:1.75rem">
+        <div class="type-card" id="type-oferta" onclick="selTipo('oferta')">
+          <div class="icon" style="background:rgba(33,150,243,.1)">
+            <i class="fa-solid fa-briefcase" style="color:var(--blue)"></i>
+          </div>
+          <h3 style="font-size:1rem;margin-bottom:.4rem">Oferta laboral</h3>
+          <p style="font-size:.83rem;color:var(--gray-500);line-height:1.5">Publica un empleo y recibe postulaciones de candidatos con CV.</p>
+        </div>
+        <div class="type-card" id="type-servicio" onclick="selTipo('servicio')">
+          <div class="icon" style="background:rgba(0,188,212,.1)">
+            <i class="fa-solid fa-wrench" style="color:var(--teal)"></i>
+          </div>
+          <h3 style="font-size:1rem;margin-bottom:.4rem">Servicio independiente</h3>
+          <p style="font-size:.83rem;color:var(--gray-500);line-height:1.5">Ofrece tus servicios profesionales y que los clientes te contacten por WhatsApp.</p>
+        </div>
+      </div>
+
+      <h3 style="font-size:1rem;font-weight:700;color:var(--navy);margin-bottom:1rem">Elige tu plan</h3>
+      <div class="grid-2" style="margin-bottom:1.75rem">
+        <div class="plan-card" id="plan-basico" onclick="selPlan('basico')">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:.75rem">
+            <div>
+              <div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--gray-500);margin-bottom:.3rem">Plan Básico</div>
+              <div class="plan-price">S/5 <span>/ publicación</span></div>
+            </div>
+            <div style="width:20px;height:20px;border-radius:50%;border:2px solid var(--gray-300);display:flex;align-items:center;justify-content:center" id="radio-basico"></div>
+          </div>
+          <ul style="list-style:none;font-size:.85rem;color:var(--gray-600);display:flex;flex-direction:column;gap:.4rem">
+            <li><i class="fa-solid fa-check" style="color:var(--success);margin-right:.4rem"></i>10 días de vigencia</li>
+            <li><i class="fa-solid fa-check" style="color:var(--success);margin-right:.4rem"></i>Aparece en el listado</li>
+            <li><i class="fa-solid fa-xmark" style="color:var(--gray-300);margin-right:.4rem"></i>Sin posicionamiento prioritario</li>
+          </ul>
+        </div>
+
+        <div class="plan-card plan-destacado" id="plan-destacado" onclick="selPlan('destacado')">
+          <div style="position:absolute;top:-1px;right:1rem">
+            <span class="badge badge-gold" style="background:linear-gradient(135deg,#f59e0b,#d97706);color:white;font-size:.68rem">⭐ Recomendado</span>
+          </div>
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:.75rem">
+            <div>
+              <div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--gray-500);margin-bottom:.3rem">Plan Destacado</div>
+              <div class="plan-price" style="color:#d97706">S/10 <span>/ publicación</span></div>
+            </div>
+            <div style="width:20px;height:20px;border-radius:50%;border:2px solid var(--gray-300);display:flex;align-items:center;justify-content:center" id="radio-destacado"></div>
+          </div>
+          <ul style="list-style:none;font-size:.85rem;color:var(--gray-600);display:flex;flex-direction:column;gap:.4rem">
+            <li><i class="fa-solid fa-check" style="color:var(--success);margin-right:.4rem"></i>20 días de vigencia</li>
+            <li><i class="fa-solid fa-check" style="color:var(--success);margin-right:.4rem"></i>Aparece en el listado</li>
+            <li><i class="fa-solid fa-check" style="color:var(--success);margin-right:.4rem"></i>Posicionamiento prioritario</li>
+            <li><i class="fa-solid fa-check" style="color:var(--success);margin-right:.4rem"></i>Badge "Destacado" visible</li>
+          </ul>
+        </div>
+      </div>
+
+      <button class="btn btn-primary w-100 btn-lg" onclick="irPaso2()" id="btn-continuar" disabled>
+        Continuar al resumen <i class="fa-solid fa-arrow-right"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- STEP 2: Resumen y pago -->
+  <div class="step-content card" id="step-2">
+    <div class="card-header">
+      <span class="card-title"><i class="fa-solid fa-receipt" style="color:var(--blue);margin-right:.5rem"></i>Resumen y pago</span>
+    </div>
+    <div class="card-body">
+      <div style="background:var(--gray-50);border-radius:var(--radius-lg);padding:1.25rem;margin-bottom:1.5rem;border:1px solid var(--gray-100)">
+        <h3 style="font-size:.88rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--gray-500);margin-bottom:1rem">Resumen de tu solicitud</h3>
+        <div style="display:flex;flex-direction:column;gap:.6rem">
+          <div style="display:flex;justify-content:space-between;font-size:.92rem">
+            <span style="color:var(--gray-600)">Tipo de publicación</span>
+            <span id="resumen-tipo" style="font-weight:600;color:var(--navy)">—</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:.92rem">
+            <span style="color:var(--gray-600)">Plan seleccionado</span>
+            <span id="resumen-plan" style="font-weight:600;color:var(--navy)">—</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:.92rem">
+            <span style="color:var(--gray-600)">Vigencia</span>
+            <span id="resumen-dias" style="font-weight:600;color:var(--navy)">—</span>
+          </div>
+          <div style="height:1px;background:var(--gray-200);margin:.25rem 0"></div>
+          <div style="display:flex;justify-content:space-between;font-size:1.05rem">
+            <span style="font-weight:700;color:var(--navy)">Total a pagar</span>
+            <span id="resumen-precio" style="font-weight:800;color:var(--blue);font-family:var(--font-head)">—</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="warning-box" style="margin-bottom:1.5rem">
+        <div style="display:flex;gap:.75rem;align-items:flex-start">
+          <i class="fa-solid fa-circle-info" style="color:#f59e0b;font-size:1.1rem;margin-top:.1rem"></i>
+          <div>
+            <div style="font-size:.88rem;font-weight:700;color:var(--gray-800);margin-bottom:.3rem">Proceso de pago manual</div>
+            <p style="font-size:.83rem;color:var(--gray-600);line-height:1.6">
+              El pago se realiza directamente al administrador por WhatsApp. Una vez que confirmes tu solicitud, 
+              envíanos un mensaje y el admin verificará tu pago. Después podrás completar los datos de tu publicación.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:.75rem">
+        <button class="btn btn-primary btn-lg w-100" onclick="crearSolicitud()" id="btn-crear-solicitud">
+          <i class="fa-solid fa-check"></i> Confirmar solicitud
+        </button>
+        <button class="btn btn-whatsapp btn-lg w-100" id="btn-pagar-wsp" style="display:none" onclick="pagarWhatsApp()">
+          <i class="fa-brands fa-whatsapp"></i> Avisar al administrador por WhatsApp
+        </button>
+        <button class="btn btn-ghost w-100" onclick="irPaso1()">
+          <i class="fa-solid fa-arrow-left"></i> Volver al paso anterior
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 3: Esperando verificación -->
+  <div class="step-content card" id="step-3">
+    <div class="card-body text-center" style="padding:3rem 2rem">
+      <div style="width:80px;height:80px;background:rgba(245,158,11,.1);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:2rem;margin:0 auto 1.25rem">
+        <i class="fa-solid fa-hourglass-half" style="color:#f59e0b"></i>
+      </div>
+      <h2 style="font-size:1.35rem;margin-bottom:.6rem">Esperando verificación de pago</h2>
+      <p style="color:var(--gray-500);font-size:.92rem;max-width:440px;margin:0 auto 1.5rem;line-height:1.7">
+        Tu solicitud <strong id="solicitud-id-text">#—</strong> fue creada. El administrador verificará tu pago 
+        y recibirás una notificación cuando esté aprobado. Mientras tanto, puedes avisar por WhatsApp.
+      </p>
+
+      <div style="background:var(--gray-50);border-radius:var(--radius-lg);padding:1.25rem;text-align:left;margin-bottom:1.5rem;border:1px solid var(--gray-100)">
+        <div style="font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--gray-400);margin-bottom:.75rem">Próximos pasos</div>
+        <div style="display:flex;flex-direction:column;gap:.75rem">
+          <div style="display:flex;gap:.75rem;align-items:flex-start">
+            <div style="width:28px;height:28px;background:var(--success);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+              <i class="fa-solid fa-check" style="color:white;font-size:.7rem"></i>
+            </div>
+            <div><div style="font-size:.88rem;font-weight:600">Solicitud creada</div><div style="font-size:.78rem;color:var(--gray-500)">Tu solicitud de pago fue registrada</div></div>
+          </div>
+          <div style="display:flex;gap:.75rem;align-items:flex-start">
+            <div style="width:28px;height:28px;background:rgba(245,158,11,.2);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+              <i class="fa-brands fa-whatsapp" style="color:#f59e0b;font-size:.8rem"></i>
+            </div>
+            <div><div style="font-size:.88rem;font-weight:600">Paga por WhatsApp</div><div style="font-size:.78rem;color:var(--gray-500)">Envía el pago y avisa al administrador</div></div>
+          </div>
+          <div style="display:flex;gap:.75rem;align-items:flex-start">
+            <div style="width:28px;height:28px;background:rgba(33,150,243,.1);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+              <i class="fa-solid fa-shield-check" style="color:var(--blue);font-size:.75rem"></i>
+            </div>
+            <div><div style="font-size:.88rem;font-weight:600">Admin verifica el pago</div><div style="font-size:.78rem;color:var(--gray-500)">Recibirás una notificación cuando sea aprobado</div></div>
+          </div>
+          <div style="display:flex;gap:.75rem;align-items:flex-start">
+            <div style="width:28px;height:28px;background:rgba(16,185,129,.1);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+              <i class="fa-solid fa-pen-to-square" style="color:var(--success);font-size:.75rem"></i>
+            </div>
+            <div><div style="font-size:.88rem;font-weight:600">Completa tu publicación</div><div style="font-size:.78rem;color:var(--gray-500)">Ingresa los detalles y queda en línea</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:.75rem">
+        <button class="btn btn-whatsapp btn-lg w-100" id="btn-wsp-espera" onclick="pagarWhatsApp()">
+          <i class="fa-brands fa-whatsapp"></i> Avisar al administrador por WhatsApp
+        </button>
+        <a href="/pages/perfil.html" class="btn btn-outline w-100">
+          <i class="fa-solid fa-user"></i> Ir a mi perfil para seguimiento
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 4: Formulario de datos -->
+  <div class="step-content card" id="step-4">
+    <div class="card-header">
+      <span class="card-title"><i class="fa-solid fa-pen-to-square" style="color:var(--blue);margin-right:.5rem"></i>Completa los datos de tu publicación</span>
+    </div>
+    <div class="card-body">
+      <!-- Formulario oferta -->
+      <form id="form-oferta" style="display:none" onsubmit="completarPublicacion(event)">
+        <div class="grid-2">
+          <div class="form-group" style="grid-column:1/-1">
+            <label class="form-label">Título del puesto *</label>
+            <input type="text" class="form-control" id="o-titulo" placeholder="Ej: Electricista residencial" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Categoría *</label>
+            <select class="form-control" id="o-categoria" required>
+              <option value="">Seleccionar...</option>
+              <option value="construccion">Construcción</option>
+              <option value="electricidad">Electricidad</option>
+              <option value="pintura">Pintura</option>
+              <option value="fontaneria">Fontanería</option>
+              <option value="tecnologia">Tecnología</option>
+              <option value="otros">Otros</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Tipo de contrato *</label>
+            <select class="form-control" id="o-contrato" required>
+              <option value="">Seleccionar...</option>
+              <option value="Por horas">Por horas</option>
+              <option value="Por proyecto">Por proyecto</option>
+              <option value="Jornada completa">Jornada completa</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Modalidad *</label>
+            <select class="form-control" id="o-modalidad" required>
+              <option value="">Seleccionar...</option>
+              <option value="presencial">Presencial</option>
+              <option value="remoto">Remoto</option>
+              <option value="hibrido">Híbrido</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Ubicación (ciudad/distrito) *</label>
+            <input type="text" class="form-control" id="o-ubicacion" placeholder="Ej: Miraflores, Lima" required>
+          </div>
+          <div class="form-group" style="grid-column:1/-1">
+            <label class="form-label">Descripción del puesto *</label>
+            <textarea class="form-control" id="o-descripcion" rows="4" placeholder="Describe las funciones y responsabilidades..." required></textarea>
+          </div>
+          <div class="form-group" style="grid-column:1/-1">
+            <label class="form-label">Requisitos</label>
+            <textarea class="form-control" id="o-requisitos" rows="3" placeholder="Experiencia mínima, habilidades, documentos..."></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Teléfono de contacto</label>
+            <input type="tel" class="form-control" id="o-telefono" placeholder="9XXXXXXXX">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email de contacto</label>
+            <input type="email" class="form-control" id="o-email" placeholder="empresa@email.com">
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary btn-lg w-100" id="btn-completar">
+          <i class="fa-solid fa-rocket"></i> Publicar oferta laboral
+        </button>
+      </form>
+
+      <!-- Formulario servicio -->
+      <form id="form-servicio" style="display:none" onsubmit="completarPublicacion(event)">
+        <div class="grid-2">
+          <div class="form-group" style="grid-column:1/-1">
+            <label class="form-label">Título del servicio *</label>
+            <input type="text" class="form-control" id="s-titulo" placeholder="Ej: Gasfitero profesional a domicilio" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Categoría</label>
+            <select class="form-control" id="s-categoria">
+              <option value="">Seleccionar...</option>
+              <option value="construccion">Construcción</option>
+              <option value="electricidad">Electricidad</option>
+              <option value="pintura">Pintura</option>
+              <option value="fontaneria">Fontanería</option>
+              <option value="tecnologia">Tecnología</option>
+              <option value="otros">Otros</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Ubicación (ciudad) *</label>
+            <input type="text" class="form-control" id="s-ubicacion" placeholder="Ej: Arequipa" required>
+          </div>
+          <div class="form-group" style="grid-column:1/-1">
+            <label class="form-label">Descripción del servicio *</label>
+            <textarea class="form-control" id="s-descripcion" rows="4" placeholder="Describe tu servicio, cómo trabajas, qué incluye..." required></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Años de experiencia</label>
+            <input type="number" class="form-control" id="s-experiencia" placeholder="Ej: 5" min="0" max="50">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Precio aproximado</label>
+            <input type="text" class="form-control" id="s-precio" placeholder="Ej: 80 - 150 por día">
+          </div>
+          <div class="form-group" style="grid-column:1/-1">
+            <label class="form-label">Número de WhatsApp *</label>
+            <div class="d-flex align-center gap-1">
+              <span style="font-size:.85rem;color:var(--gray-500);white-space:nowrap;padding:.65rem .75rem;background:var(--gray-50);border:1.5px solid var(--gray-200);border-right:none;border-radius:var(--radius-md) 0 0 var(--radius-md)">+51</span>
+              <input type="tel" class="form-control" id="s-wsp" placeholder="9XXXXXXXX" maxlength="9" pattern="9[0-9]{8}" style="border-radius:0 var(--radius-md) var(--radius-md) 0" required>
+            </div>
+            <div class="form-hint">Los interesados te contactarán por este número</div>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-teal btn-lg w-100" id="btn-completar-s">
+          <i class="fa-solid fa-rocket"></i> Publicar servicio independiente
+        </button>
+      </form>
+    </div>
+  </div>
+
+</div>
+
+<footer style="background:var(--navy-dark);padding:1.5rem;text-align:center">
+  <p style="color:rgba(255,255,255,.4);font-size:.8rem">© 2025 Workify</p>
+</footer>
+
+<script src="/js/core.js"></script>
+<script>
+let selTipoVal  = '';
+let selPlanVal  = '';
+let solicitudId = null;
+let wspLink     = '';
+
+// Verificar autenticación
+document.addEventListener('DOMContentLoaded', () => {
+  if (!Auth.isLoggedIn()) {
+    Toast.warning('Debes iniciar sesión para publicar');
+    setTimeout(() => openAuthModal(), 500);
+    return;
+  }
+  // Verificar si hay solicitud verificada pendiente de completar
+  checkSolicitudPendiente();
+});
+
+async function checkSolicitudPendiente() {
+  try {
+    const solicitudes = await api.get('/api/solicitudes-pago/mis-solicitudes');
+    const verificada  = solicitudes.find(s => s.estado === 'pago_verificado');
+    const esperando   = solicitudes.find(s => s.estado === 'esperando_confirmacion');
+
+    if (verificada) {
+      solicitudId = verificada.id;
+      selTipoVal  = verificada.tipo;
+      selPlanVal  = verificada.plan;
+      irPaso4();
+      Toast.info('Tu pago fue verificado. Completa los datos de tu publicación.', '¡Pago verificado!');
+    } else if (esperando) {
+      solicitudId = esperando.id;
+      selTipoVal  = esperando.tipo;
+      selPlanVal  = esperando.plan;
+      document.getElementById('solicitud-id-text').textContent = `#${solicitudId}`;
+      wspLink = generarLinkWsp(esperando);
+      irPaso(3);
+    }
+  } catch {}
+}
+
+function selTipo(tipo) {
+  selTipoVal = tipo;
+  document.getElementById('type-oferta').classList.toggle('selected', tipo === 'oferta');
+  document.getElementById('type-servicio').classList.toggle('selected', tipo === 'servicio');
+  checkBtnContinuar();
+}
+
+function selPlan(plan) {
+  selPlanVal = plan;
+  document.getElementById('plan-basico').classList.toggle('selected', plan === 'basico');
+  document.getElementById('plan-destacado').classList.toggle('selected', plan === 'destacado');
+
+  // Radios visuales
+  document.getElementById('radio-basico').innerHTML    = plan === 'basico'    ? '<i class="fa-solid fa-circle" style="color:var(--blue);font-size:.65rem"></i>' : '';
+  document.getElementById('radio-destacado').innerHTML = plan === 'destacado' ? '<i class="fa-solid fa-circle" style="color:#d97706;font-size:.65rem"></i>' : '';
+  document.getElementById('radio-basico').style.borderColor    = plan === 'basico'    ? 'var(--blue)' : 'var(--gray-300)';
+  document.getElementById('radio-destacado').style.borderColor = plan === 'destacado' ? '#d97706'     : 'var(--gray-300)';
+
+  checkBtnContinuar();
+}
+
+function checkBtnContinuar() {
+  document.getElementById('btn-continuar').disabled = !(selTipoVal && selPlanVal);
+}
+
+function irPaso1() { irPaso(1); }
+
+function irPaso2() {
+  if (!selTipoVal || !selPlanVal) { Toast.warning('Selecciona tipo y plan'); return; }
+
+  const tipoLabel  = selTipoVal === 'oferta' ? 'Oferta laboral' : 'Servicio independiente';
+  const planLabel  = selPlanVal === 'basico'  ? 'Básico'         : 'Destacado';
+  const precio     = selPlanVal === 'basico'  ? 'S/ 5.00'        : 'S/ 10.00';
+  const dias       = selPlanVal === 'basico'  ? '10 días'        : '20 días';
+
+  document.getElementById('resumen-tipo').textContent  = tipoLabel;
+  document.getElementById('resumen-plan').textContent  = planLabel;
+  document.getElementById('resumen-dias').textContent  = dias;
+  document.getElementById('resumen-precio').textContent = precio;
+
+  irPaso(2);
+}
+
+function irPaso4() {
+  irPaso(4);
+  document.getElementById('form-oferta').style.display   = selTipoVal === 'oferta'   ? 'block' : 'none';
+  document.getElementById('form-servicio').style.display = selTipoVal === 'servicio' ? 'block' : 'none';
+}
+
+function irPaso(n) {
+  for (let i = 1; i <= 4; i++) {
+    document.getElementById(`step-${i}`).classList.toggle('active', i === n);
+    const ind = document.getElementById(`step-ind-${i}`);
+    ind.classList.remove('active', 'done');
+    if (i < n)  ind.classList.add('done');
+    if (i === n) ind.classList.add('active');
+
+    // Ícono check en done
+    if (i < n) {
+      ind.querySelector('.step-circle').innerHTML = '<i class="fa-solid fa-check" style="font-size:.65rem"></i>';
+    } else if (i === n) {
+      ind.querySelector('.step-circle').textContent = i;
+    } else {
+      ind.querySelector('.step-circle').textContent = i;
+    }
+
+    if (i <= 3) {
+      const line = document.getElementById(`line-${i}`);
+      if (line) line.classList.toggle('done', i < n);
+    }
+  }
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// Reemplaza la función crearSolicitud completa
+async function crearSolicitud() {
+  const btn = document.getElementById('btn-crear-solicitud');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Creando solicitud...';
+
+  try {
+    const data = await api.post('/api/solicitudes-pago', {   // ← URL corregida
+      tipo: selTipoVal,
+      plan: selPlanVal
+    });
+
+    solicitudId = data.solicitud.id;
+    // El backend ya devuelve el link completo con el número real
+    wspLink = `https://wa.me/${data.whatsapp_numero}?text=${data.whatsapp_mensaje}`;
+
+    document.getElementById('solicitud-id-text').textContent = `#${solicitudId}`;
+    document.getElementById('btn-crear-solicitud').style.display = 'none';
+    document.getElementById('btn-pagar-wsp').style.display = 'block';
+
+    Toast.success(`Solicitud #${solicitudId} creada. Ahora avisa al admin por WhatsApp.`, '¡Solicitud registrada!');
+    irPaso(3);
+  } catch (err) {
+    Toast.error(err.message);
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fa-solid fa-check"></i> Confirmar solicitud';
+  }
+}
+
+function generarLinkWsp(sol) {
+  const adminNum = '51999999999'; // Se reemplaza con var de entorno
+  const msg = `Hola, deseo pagar el plan ${sol.plan === 'basico' ? 'Básico (S/5)' : 'Destacado (S/10)'} para mi publicación tipo ${sol.tipo === 'oferta' ? 'Oferta Laboral' : 'Servicio Independiente'}. Mi ID de solicitud es #${sol.id}. Quedo atento.`;
+  return `https://wa.me/${adminNum}?text=${encodeURIComponent(msg)}`;
+}
+
+function pagarWhatsApp() {
+  if (wspLink) window.open(wspLink, '_blank');
+  Toast.info('Se abrió WhatsApp. Envía el mensaje al administrador y espera la verificación.');
+}
+
+async function completarPublicacion(e) {
+  e.preventDefault();
+  if (!solicitudId) { Toast.error('No se encontró la solicitud de pago'); return; }
+
+  const btn = e.target.querySelector('[type=submit]');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Publicando...';
+
+  let body = {};
+
+  if (selTipoVal === 'oferta') {
+    body = {
+      titulo:           document.getElementById('o-titulo').value,
+      categoria:        document.getElementById('o-categoria').value,
+      tipo_contrato:    document.getElementById('o-contrato').value,
+      modalidad:        document.getElementById('o-modalidad').value,
+      ubicacion:        document.getElementById('o-ubicacion').value,
+      descripcion:      document.getElementById('o-descripcion').value,
+      requisitos:       document.getElementById('o-requisitos').value,
+      telefono_contacto: document.getElementById('o-telefono').value,
+      email_contacto:   document.getElementById('o-email').value,
+    };
+  } else {
+    body = {
+      titulo:       document.getElementById('s-titulo').value,
+      categoria:    document.getElementById('s-categoria').value,
+      ubicacion:    document.getElementById('s-ubicacion').value,
+      descripcion:  document.getElementById('s-descripcion').value,
+      experiencia:  document.getElementById('s-experiencia').value,
+      precio_aprox: document.getElementById('s-precio').value,
+      numero_wsp:   document.getElementById('s-wsp').value,
+    };
+  }
+
+  try {
+    const data = await api.post(`/api/publicaciones/${solicitudId}/completar`, body);
+    Toast.success('¡Tu publicación ya está en línea!', '¡Publicado!');
+    irPaso(4);
+
+    // Reemplazar formulario con mensaje de éxito
+    document.querySelector('#step-4 .card-body').innerHTML = `
+      <div style="text-align:center;padding:2rem">
+        <div style="width:80px;height:80px;background:rgba(16,185,129,.1);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:2rem;margin:0 auto 1.25rem">
+          <i class="fa-solid fa-circle-check" style="color:var(--success)"></i>
+        </div>
+        <h2 style="font-size:1.35rem;margin-bottom:.6rem">¡Publicación creada!</h2>
+        <p style="color:var(--gray-500);max-width:380px;margin:0 auto 1.5rem;font-size:.92rem;line-height:1.7">
+          Tu publicación ya está en línea y visible para todos los usuarios de Workify.
+        </p>
+        <div style="display:flex;flex-direction:column;gap:.75rem;max-width:300px;margin:0 auto">
+          <a href="/pages/${selTipoVal === 'oferta' ? 'ofertas' : 'servicios'}.html" class="btn btn-primary btn-lg">
+            <i class="fa-solid fa-eye"></i> Ver mi publicación
+          </a>
+          <a href="/pages/perfil.html" class="btn btn-outline">
+            <i class="fa-solid fa-user"></i> Ir a mi perfil
+          </a>
+        </div>
+      </div>`;
+  } catch (err) {
+    Toast.error(err.message);
+    btn.disabled = false;
+    btn.innerHTML = `<i class="fa-solid fa-rocket"></i> Publicar ${selTipoVal === 'oferta' ? 'oferta laboral' : 'servicio independiente'}`;
+  }
+}
+</script>
+</body>
+</html>

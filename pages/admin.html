@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel Admin — Workify</title>
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    .admin-layout { display: grid; grid-template-columns: 220px 1fr; gap: 1.5rem; align-items: start; }
+    .stat-card {
+      background: var(--white); border-radius: var(--radius-lg);
+      padding: 1.25rem; border: 1px solid var(--gray-100);
+      box-shadow: var(--shadow-sm); display: flex; align-items: center; gap: 1rem;
+    }
+    .stat-icon { width: 48px; height: 48px; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0; }
+    .stat-num  { font-family: var(--font-head); font-size: 1.6rem; font-weight: 800; color: var(--navy); line-height: 1; }
+    .stat-lbl  { font-size: .78rem; color: var(--gray-500); margin-top: .2rem; }
+    @media (max-width: 768px) { .admin-layout { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+
+<nav class="navbar" id="main-nav">
+  <a href="/" class="navbar-brand">Workify<span class="brand-dot"></span></a>
+  <div class="navbar-nav">
+    <span style="font-size:.8rem;color:rgba(255,255,255,.5);font-weight:500;letter-spacing:.06em;text-transform:uppercase">Panel Administrador</span>
+  </div>
+  <div class="navbar-actions">
+    <button class="notif-btn" id="nav-notif-btn" onclick="openNotificaciones()" style="display:none">
+      <i class="fa-regular fa-bell"></i>
+      <span class="notif-badge" id="notif-count" style="display:none">0</span>
+    </button>
+    <a href="/" class="btn btn-ghost btn-sm" style="color:rgba(255,255,255,.7)"><i class="fa-solid fa-arrow-left"></i> Ir al sitio</a>
+    <button class="btn btn-outline btn-sm" onclick="logout()" style="border-color:rgba(255,255,255,.2);color:rgba(255,255,255,.7)"><i class="fa-solid fa-right-from-bracket"></i> Salir</button>
+    <!-- Estos se requieren para initNavbar, pero están ocultos -->
+    <span id="nav-publicar-btn" style="display:none"></span>
+    <span id="nav-perfil-btn"   style="display:none"></span>
+    <span id="nav-admin-btn"    style="display:none"></span>
+    <span id="nav-auth-btn"     style="display:none"></span>
+  </div>
+</nav>
+
+<div class="container section">
+  <div id="auth-wall" style="display:none;text-align:center;padding:4rem 1rem">
+    <div style="width:72px;height:72px;background:rgba(239,68,68,.1);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.8rem;margin:0 auto 1rem">
+      <i class="fa-solid fa-shield-halved" style="color:var(--danger)"></i>
+    </div>
+    <h2 style="margin-bottom:.5rem">Acceso denegado</h2>
+    <p style="color:var(--gray-500);margin-bottom:1.25rem">Solo administradores pueden ver esta sección.</p>
+    <button class="btn btn-primary" onclick="openAuthModal()">Iniciar sesión</button>
+  </div>
+
+  <div id="admin-dashboard" style="display:none">
+    <!-- Stats -->
+    <div class="grid-4" id="admin-stats" style="margin-bottom:2rem">
+      <div class="stat-card"><div class="stat-icon" style="background:rgba(239,68,68,.1)"><i class="fa-solid fa-clock" style="color:var(--danger)"></i></div><div><div class="stat-num" id="s-pendientes">—</div><div class="stat-lbl">Pagos pendientes</div></div></div>
+      <div class="stat-card"><div class="stat-icon" style="background:rgba(33,150,243,.1)"><i class="fa-solid fa-bullhorn" style="color:var(--blue)"></i></div><div><div class="stat-num" id="s-pubs">—</div><div class="stat-lbl">Publicaciones activas</div></div></div>
+      <div class="stat-card"><div class="stat-icon" style="background:rgba(0,188,212,.1)"><i class="fa-solid fa-users" style="color:var(--teal)"></i></div><div><div class="stat-num" id="s-users">—</div><div class="stat-lbl">Usuarios registrados</div></div></div>
+      <div class="stat-card"><div class="stat-icon" style="background:rgba(16,185,129,.1)"><i class="fa-solid fa-paper-plane" style="color:var(--success)"></i></div><div><div class="stat-num" id="s-posts">—</div><div class="stat-lbl">Postulaciones totales</div></div></div>
+    </div>
+
+    <div class="admin-layout">
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <div class="sidebar-header">
+          <div class="sidebar-avatar">A</div>
+          <div class="sidebar-name">Administrador</div>
+          <div class="sidebar-role">Control total</div>
+        </div>
+        <nav class="sidebar-nav">
+          <button class="sidebar-link active" onclick="showAdminTab('solicitudes', this)">
+            <i class="fa-solid fa-credit-card"></i> Solicitudes de pago
+            <span id="badge-sol" style="margin-left:auto;background:var(--danger);color:white;font-size:.65rem;padding:.1rem .4rem;border-radius:var(--radius-full);font-weight:700;display:none">0</span>
+          </button>
+          <button class="sidebar-link" onclick="showAdminTab('publicaciones', this)">
+            <i class="fa-solid fa-bullhorn"></i> Publicaciones
+          </button>
+          <button class="sidebar-link" onclick="showAdminTab('postulaciones', this)">
+            <i class="fa-solid fa-paper-plane"></i> Postulaciones
+          </button>
+          <button class="sidebar-link" onclick="showAdminTab('usuarios', this)">
+            <i class="fa-solid fa-users"></i> Usuarios
+          </button>
+        </nav>
+      </aside>
+
+      <!-- Content -->
+      <main>
+        <!-- Solicitudes de pago -->
+        <div id="atab-solicitudes" class="atab-panel">
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title"><i class="fa-solid fa-credit-card" style="color:var(--blue);margin-right:.5rem"></i>Solicitudes de pago</span>
+              <div style="display:flex;gap:.5rem">
+                <select id="f-sol-estado" class="form-control" style="max-width:180px;font-size:.83rem" onchange="loadSolicitudes()">
+                  <option value="">Todos los estados</option>
+                  <option value="esperando_confirmacion">Esperando pago</option>
+                  <option value="pago_verificado">Verificados</option>
+                  <option value="denegado">Denegados</option>
+                </select>
+              </div>
+            </div>
+            <div class="card-body">
+              <div id="sol-content"><div class="loading-overlay"><span class="spinner dark"></span>Cargando...</div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Publicaciones -->
+        <div id="atab-publicaciones" class="atab-panel" style="display:none">
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title"><i class="fa-solid fa-bullhorn" style="color:var(--blue);margin-right:.5rem"></i>Publicaciones</span>
+              <select id="f-pub-tipo" class="form-control" style="max-width:160px;font-size:.83rem" onchange="loadPublicaciones()">
+                <option value="">Todos los tipos</option>
+                <option value="oferta">Ofertas</option>
+                <option value="servicio">Servicios</option>
+              </select>
+            </div>
+            <div class="card-body">
+              <div id="pub-content"><div class="loading-overlay"><span class="spinner dark"></span>Cargando...</div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Postulaciones -->
+        <div id="atab-postulaciones" class="atab-panel" style="display:none">
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title"><i class="fa-solid fa-paper-plane" style="color:var(--blue);margin-right:.5rem"></i>Postulaciones</span>
+            </div>
+            <div class="card-body">
+              <div id="post-content"><div class="loading-overlay"><span class="spinner dark"></span>Cargando...</div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Usuarios -->
+        <div id="atab-usuarios" class="atab-panel" style="display:none">
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title"><i class="fa-solid fa-users" style="color:var(--blue);margin-right:.5rem"></i>Usuarios registrados</span>
+            </div>
+            <div class="card-body">
+              <div id="usr-content"><div class="loading-overlay"><span class="spinner dark"></span>Cargando...</div></div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+</div>
+
+<footer style="background:var(--navy-dark);padding:1.5rem;text-align:center">
+  <p style="color:rgba(255,255,255,.4);font-size:.8rem">© 2025 Workify — Panel de administración</p>
+</footer>
+
+<script src="/js/core.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  if (!Auth.isLoggedIn() || !Auth.isAdmin()) {
+    document.getElementById('auth-wall').style.display = 'block';
+    return;
+  }
+  document.getElementById('admin-dashboard').style.display = 'block';
+  loadStats();
+  loadSolicitudes();
+});
+
+function showAdminTab(tab, btn) {
+  document.querySelectorAll('.atab-panel').forEach(p => p.style.display = 'none');
+  document.querySelectorAll('.sidebar-link').forEach(b => b.classList.remove('active'));
+  document.getElementById(`atab-${tab}`).style.display = 'block';
+  if (btn) btn.classList.add('active');
+
+  if (tab === 'solicitudes')  loadSolicitudes();
+  if (tab === 'publicaciones') loadPublicaciones();
+  if (tab === 'postulaciones') loadPostulaciones();
+  if (tab === 'usuarios')     loadUsuarios();
+}
+
+// ── Stats ─────────────────────────────────────────────────────
+async function loadStats() {
+  try {
+    const d = await api.get('/admin/stats');
+    document.getElementById('s-pendientes').textContent = d.solicitudes_pendientes;
+    document.getElementById('s-pubs').textContent       = d.publicaciones_activas;
+    document.getElementById('s-users').textContent      = d.total_usuarios;
+    document.getElementById('s-posts').textContent      = d.total_postulaciones;
+
+    const badge = document.getElementById('badge-sol');
+    if (d.solicitudes_pendientes > 0) {
+      badge.textContent    = d.solicitudes_pendientes;
+      badge.style.display  = 'inline-block';
+    }
+  } catch {}
+}
+
+// ── Solicitudes de pago ───────────────────────────────────────
+async function loadSolicitudes() {
+  const el     = document.getElementById('sol-content');
+  const estado = document.getElementById('f-sol-estado')?.value;
+  el.innerHTML = '<div class="loading-overlay"><span class="spinner dark"></span>Cargando...</div>';
+
+  try {
+    const url  = estado ? `/admin/solicitudes?estado=${estado}` : '/admin/solicitudes';
+    const data = await api.get(url);
+
+    if (!data.length) {
+      el.innerHTML = `<div class="empty-state"><i class="fa-solid fa-inbox"></i><h3>Sin solicitudes</h3><p>No hay solicitudes para mostrar.</p></div>`;
+      return;
+    }
+
+    el.innerHTML = `<div class="table-wrap"><table class="table">
+      <thead><tr><th>#ID</th><th>Usuario</th><th>Email</th><th>Tipo</th><th>Plan</th><th>Fecha</th><th>Estado</th><th>Acciones</th></tr></thead>
+      <tbody>
+      ${data.map(s => `<tr>
+        <td style="font-weight:700;color:var(--navy)">#${s.id}</td>
+        <td style="font-weight:600">${s.usuarios?.nombre || '—'}</td>
+        <td style="font-size:.82rem;color:var(--gray-500)">${s.usuarios?.email || '—'}</td>
+        <td>${s.tipo === 'oferta' ? 'Oferta' : 'Servicio'}</td>
+        <td><span class="badge ${s.plan==='destacado'?'badge-gold':'badge-gray'}">${s.plan==='basico'?'Básico S/5':'Destacado S/10'}</span></td>
+        <td style="font-size:.82rem;color:var(--gray-400)">${formatFecha(s.fecha_solicitud)}</td>
+        <td>${estadoBadge(s.estado)}</td>
+        <td>
+          <div style="display:flex;gap:.35rem">
+            ${s.estado === 'esperando_confirmacion' ? `
+              <button class="btn btn-sm btn-success" onclick="cambiarEstadoSolicitud(${s.id},'pago_verificado')" title="Verificar pago">
+                <i class="fa-solid fa-check"></i> Verificar
+              </button>
+              <button class="btn btn-sm btn-danger" onclick="cambiarEstadoSolicitud(${s.id},'denegado')" title="Denegar">
+                <i class="fa-solid fa-xmark"></i>
+              </button>` : s.estado === 'pago_verificado' ? `
+              <span style="font-size:.8rem;color:var(--success)"><i class="fa-solid fa-check-double"></i> Verificado</span>` : `
+              <span style="font-size:.8rem;color:var(--gray-400)">—</span>`}
+          </div>
+        </td>
+      </tr>`).join('')}
+      </tbody>
+    </table></div>`;
+  } catch { el.innerHTML = '<div class="empty-state"><i class="fa-solid fa-circle-exclamation"></i><h3>Error al cargar</h3></div>'; }
+}
+
+async function cambiarEstadoSolicitud(id, estado) {
+  const label = estado === 'pago_verificado' ? 'verificar' : 'denegar';
+  confirmDialog(`¿Deseas ${label} la solicitud #${id}?`, async () => {
+    try {
+      await api.patch(`/admin/solicitudes/${id}`, { estado });
+      Toast.success(`Solicitud #${id} ${estado === 'pago_verificado' ? 'verificada' : 'denegada'}`);
+      loadSolicitudes();
+      loadStats();
+    } catch (err) { Toast.error(err.message); }
+  }, `¿${label.charAt(0).toUpperCase() + label.slice(1)} solicitud?`);
+}
+
+// ── Publicaciones ─────────────────────────────────────────────
+async function loadPublicaciones() {
+  const el   = document.getElementById('pub-content');
+  const tipo = document.getElementById('f-pub-tipo')?.value;
+  el.innerHTML = '<div class="loading-overlay"><span class="spinner dark"></span>Cargando...</div>';
+
+  try {
+    const url  = tipo ? `/admin/publicaciones?tipo=${tipo}` : '/admin/publicaciones';
+    const data = await api.get(url);
+
+    if (!data.length) {
+      el.innerHTML = `<div class="empty-state"><i class="fa-solid fa-bullhorn"></i><h3>Sin publicaciones</h3></div>`;
+      return;
+    }
+
+    el.innerHTML = `<div class="table-wrap"><table class="table">
+      <thead><tr><th>#</th><th>Título</th><th>Tipo</th><th>Usuario</th><th>Vence</th><th>Estado</th><th>Acciones</th></tr></thead>
+      <tbody>
+      ${data.map(p => `<tr>
+        <td style="font-size:.8rem;color:var(--gray-400)">#${p.id}</td>
+        <td style="font-weight:600;color:var(--navy);max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.titulo}</td>
+        <td><span class="badge ${p.tipo==='oferta'?'badge-blue':'badge-teal'}">${p.tipo}</span></td>
+        <td style="font-size:.82rem;color:var(--gray-500)">${p.usuarios?.nombre || '—'}</td>
+        <td style="font-size:.82rem;color:var(--gray-400)">${formatFecha(p.fecha_fin)}</td>
+        <td>
+          ${p.activo ? '<span class="badge badge-green">Activo</span>' : '<span class="badge badge-red">Inactivo</span>'}
+          ${p.destacado ? '<span class="badge badge-gold" style="margin-left:.25rem">★ Dest.</span>' : ''}
+        </td>
+        <td>
+          <div style="display:flex;gap:.35rem">
+            ${p.activo
+              ? `<button class="btn btn-sm btn-danger" onclick="togglePub(${p.id}, false)" title="Desactivar"><i class="fa-solid fa-eye-slash"></i></button>`
+              : `<button class="btn btn-sm btn-success" onclick="togglePub(${p.id}, true)"  title="Activar"><i class="fa-solid fa-eye"></i></button>`}
+          </div>
+        </td>
+      </tr>`).join('')}
+      </tbody>
+    </table></div>`;
+  } catch { el.innerHTML = '<div class="empty-state"><i class="fa-solid fa-circle-exclamation"></i><h3>Error al cargar</h3></div>'; }
+}
+
+async function togglePub(id, activar) {
+  try {
+    const ruta = activar ? `/admin/publicaciones/${id}/activar` : `/admin/publicaciones/${id}/desactivar`;
+    await api.patch(ruta, {});
+    Toast.success(`Publicación ${activar ? 'activada' : 'desactivada'}`);
+    loadPublicaciones();
+    loadStats();
+  } catch (err) { Toast.error(err.message); }
+}
+
+// ── Postulaciones ─────────────────────────────────────────────
+async function loadPostulaciones() {
+  const el = document.getElementById('post-content');
+  el.innerHTML = '<div class="loading-overlay"><span class="spinner dark"></span>Cargando...</div>';
+
+  try {
+    const data = await api.get('/admin/postulaciones');
+    if (!data.length) {
+      el.innerHTML = `<div class="empty-state"><i class="fa-solid fa-paper-plane"></i><h3>Sin postulaciones</h3></div>`;
+      return;
+    }
+
+    el.innerHTML = `<div class="table-wrap"><table class="table">
+      <thead><tr><th>#</th><th>Postulante</th><th>Oferta</th><th>Fecha</th><th>Estado</th><th>CV</th></tr></thead>
+      <tbody>
+      ${data.map(p => `<tr>
+        <td style="font-size:.8rem;color:var(--gray-400)">#${p.id}</td>
+        <td>
+          <div style="font-weight:600;font-size:.88rem">${p.usuarios?.nombre || '—'}</div>
+          <div style="font-size:.75rem;color:var(--gray-400)">${p.usuarios?.email || ''}</div>
+        </td>
+        <td style="font-size:.85rem;color:var(--gray-600);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.publicaciones?.titulo || '—'}</td>
+        <td style="font-size:.82rem;color:var(--gray-400)">${formatFecha(p.fecha_postulacion)}</td>
+        <td>
+          <select class="form-control" style="max-width:130px;font-size:.78rem;padding:.25rem .5rem" onchange="cambiarEstadoPost(${p.id}, this.value)">
+            ${['recibido','en_revision','contratado','rechazado'].map(e => `<option value="${e}" ${e===p.estado?'selected':''}>${e.replace('_',' ')}</option>`).join('')}
+          </select>
+        </td>
+        <td>${p.cv_url ? `<a href="${p.cv_url}" target="_blank" class="btn btn-sm btn-ghost"><i class="fa-solid fa-file-pdf" style="color:var(--danger)"></i></a>` : '—'}</td>
+      </tr>`).join('')}
+      </tbody>
+    </table></div>`;
+  } catch { el.innerHTML = '<div class="empty-state"><i class="fa-solid fa-circle-exclamation"></i><h3>Error al cargar</h3></div>'; }
+}
+
+async function cambiarEstadoPost(id, estado) {
+  try {
+    await api.patch(`/api/postulaciones/${id}/estado`, { estado });
+    Toast.success('Estado de postulación actualizado');
+  } catch (err) { Toast.error(err.message); }
+}
+
+// ── Usuarios ──────────────────────────────────────────────────
+async function loadUsuarios() {
+  const el = document.getElementById('usr-content');
+  el.innerHTML = '<div class="loading-overlay"><span class="spinner dark"></span>Cargando...</div>';
+  try {
+    const data = await api.get('/admin/usuarios');
+    if (!data.length) {
+      el.innerHTML = `<div class="empty-state"><i class="fa-solid fa-users"></i><h3>Sin usuarios</h3></div>`;
+      return;
+    }
+    el.innerHTML = `<div class="table-wrap"><table class="table">
+      <thead><tr>
+        <th>Nombre</th><th>Email</th><th>WhatsApp</th><th>Rol</th><th>Registro</th><th>CV</th><th>Acciones</th>
+      </tr></thead>
+      <tbody>
+      ${data.map(u => `<tr>
+        <td style="font-weight:600">${u.nombre || '—'}</td>
+        <td style="font-size:.83rem;color:var(--gray-500)">${u.email}</td>
+        <td style="font-size:.83rem">
+          ${u.whatsapp ? `<a href="${urlWhatsApp(u.whatsapp,'Hola, te contactamos desde Workify.')}" target="_blank" style="color:var(--teal)"><i class="fa-brands fa-whatsapp"></i> ${u.whatsapp}</a>` : '—'}
+        </td>
+        <td><span class="badge ${u.rol==='admin'?'badge-orange':'badge-gray'}">${u.rol}</span></td>
+        <td style="font-size:.78rem;color:var(--gray-400)">${formatFecha(u.created_at)}</td>
+        <td>${u.cv_url ? `<a href="${u.cv_url}" target="_blank" class="btn btn-sm btn-ghost"><i class="fa-solid fa-file-pdf" style="color:var(--danger)"></i> Ver</a>` : '<span style="font-size:.78rem;color:var(--gray-300)">Sin CV</span>'}</td>
+        <td>
+          ${u.rol !== 'admin' ? `
+            <div style="display:flex;gap:.35rem">
+              <button class="btn btn-sm btn-danger" onclick="gestionarUsuario('${u.id}','${(u.nombre||u.email).replace(/'/g,"\\'")}','bloquear')" title="Bloquear">
+                <i class="fa-solid fa-ban"></i>
+              </button>
+              <button class="btn btn-sm btn-success" onclick="gestionarUsuario('${u.id}','${(u.nombre||u.email).replace(/'/g,"\\'")}','desbloquear')" title="Desbloquear">
+                <i class="fa-solid fa-lock-open"></i>
+              </button>
+            </div>` : '<span style="font-size:.78rem;color:var(--gray-300)">Protegido</span>'}
+        </td>
+      </tr>`).join('')}
+      </tbody>
+    </table></div>`;
+  } catch {
+    el.innerHTML = '<div class="empty-state"><i class="fa-solid fa-circle-exclamation"></i><h3>Error al cargar</h3></div>';
+  }
+}
+
+async function gestionarUsuario(id, nombre, accion) {
+  confirmDialog(
+    `¿Deseas ${accion} al usuario "${nombre}"?`,
+    async () => {
+      try {
+        await api.patch(`/admin/usuarios/${id}/${accion}`, {});
+        Toast.success(`Usuario ${accion === 'bloquear' ? 'bloqueado' : 'desbloqueado'}`);
+        loadUsuarios();
+      } catch (err) { Toast.error(err.message); }
+    },
+    `¿${accion.charAt(0).toUpperCase() + accion.slice(1)} usuario?`
+  );
+}
+</script>
+</body>
+</html>

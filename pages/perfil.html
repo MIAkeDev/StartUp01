@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mi perfil — Workify</title>
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+<nav class="navbar" id="main-nav">
+  <a href="/" class="navbar-brand">Workify<span class="brand-dot"></span></a>
+  <div class="navbar-nav">
+    <a href="/pages/index.html" class="nav-link"><i class="fa-solid fa-house fa-sm"></i> Inicio</a>
+    <a href="/pages/ofertas.html" class="nav-link"><i class="fa-solid fa-briefcase fa-sm"></i> Ofertas</a>
+    <a href="/pages/servicios.html" class="nav-link"><i class="fa-solid fa-wrench fa-sm"></i> Servicios</a>
+  </div>
+  <div class="navbar-actions">
+    <button class="notif-btn" id="nav-notif-btn" onclick="openNotificaciones()" style="display:none">
+      <i class="fa-regular fa-bell"></i>
+      <span class="notif-badge" id="notif-count" style="display:none">0</span>
+    </button>
+    <a href="/pages/publicar.html" class="btn btn-teal btn-sm" id="nav-publicar-btn" style="display:none"><i class="fa-solid fa-plus"></i> Publicar</a>
+    <a href="/pages/perfil.html" class="btn btn-outline btn-sm" id="nav-perfil-btn"
+       style="display:none;background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.2);color:white"><i class="fa-solid fa-user"></i> Mi perfil</a>
+    <a href="/pages/admin.html" class="btn btn-sm" id="nav-admin-btn"
+       style="display:none;background:rgba(245,158,11,.15);color:#f59e0b;border:1px solid rgba(245,158,11,.3)"><i class="fa-solid fa-shield"></i> Admin</a>
+    <button class="btn btn-primary btn-sm" id="nav-auth-btn" onclick="openAuthModal()"><i class="fa-solid fa-arrow-right-to-bracket"></i> Ingresar</button>
+  </div>
+</nav>
+
+<div class="container section">
+  <div id="auth-wall" style="display:none;text-align:center;padding:4rem 1rem">
+    <div style="width:72px;height:72px;background:rgba(33,150,243,.1);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.8rem;margin:0 auto 1rem">
+      <i class="fa-solid fa-lock" style="color:var(--blue)"></i>
+    </div>
+    <h2 style="margin-bottom:.5rem">Acceso restringido</h2>
+    <p style="color:var(--gray-500);margin-bottom:1.25rem">Debes iniciar sesión para ver tu perfil.</p>
+    <button class="btn btn-primary" onclick="openAuthModal()">Iniciar sesión</button>
+  </div>
+
+  <div id="dashboard" class="dashboard-layout" style="display:none">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-avatar" id="sb-avatar">?</div>
+        <div class="sidebar-name" id="sb-name">—</div>
+        <div class="sidebar-role" id="sb-role">—</div>
+      </div>
+      <nav class="sidebar-nav">
+        <button class="sidebar-link active" onclick="showTab('postulaciones', this)">
+          <i class="fa-solid fa-paper-plane"></i> Mis postulaciones
+        </button>
+        <button class="sidebar-link" onclick="showTab('publicaciones', this)">
+          <i class="fa-solid fa-bullhorn"></i> Mis publicaciones
+        </button>
+        <button class="sidebar-link" onclick="showTab('solicitudes', this)">
+          <i class="fa-solid fa-credit-card"></i> Mis solicitudes
+        </button>
+        <button class="sidebar-link" onclick="showTab('perfil', this)">
+          <i class="fa-solid fa-user-gear"></i> Editar perfil
+        </button>
+        <button class="sidebar-link" onclick="showTab('cv', this)">
+          <i class="fa-solid fa-file-pdf"></i> Mi CV
+        </button>
+        <div style="height:1px;background:var(--gray-100);margin:.5rem 0"></div>
+        <button class="sidebar-link" onclick="logout()" style="color:var(--danger)">
+          <i class="fa-solid fa-right-from-bracket"></i> Cerrar sesión
+        </button>
+      </nav>
+    </aside>
+
+    <!-- Main content -->
+    <main>
+      <!-- Tab: Postulaciones -->
+      <div id="tab-postulaciones" class="tab-panel">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title"><i class="fa-solid fa-paper-plane" style="color:var(--blue);margin-right:.5rem"></i>Mis postulaciones</span>
+          </div>
+          <div class="card-body">
+            <div id="postulaciones-content">
+              <div class="loading-overlay"><span class="spinner dark"></span>Cargando...</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab: Publicaciones -->
+      <div id="tab-publicaciones" class="tab-panel" style="display:none">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title"><i class="fa-solid fa-bullhorn" style="color:var(--blue);margin-right:.5rem"></i>Mis publicaciones</span>
+            <a href="/pages/publicar.html" class="btn btn-primary btn-sm"><i class="fa-solid fa-plus"></i> Nueva</a>
+          </div>
+          <div class="card-body">
+            <div id="publicaciones-content">
+              <div class="loading-overlay"><span class="spinner dark"></span>Cargando...</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab: Solicitudes de pago -->
+      <div id="tab-solicitudes" class="tab-panel" style="display:none">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title"><i class="fa-solid fa-credit-card" style="color:var(--blue);margin-right:.5rem"></i>Mis solicitudes de pago</span>
+          </div>
+          <div class="card-body">
+            <div id="solicitudes-content">
+              <div class="loading-overlay"><span class="spinner dark"></span>Cargando...</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab: Perfil -->
+      <div id="tab-perfil" class="tab-panel" style="display:none">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title"><i class="fa-solid fa-user-gear" style="color:var(--blue);margin-right:.5rem"></i>Editar perfil</span>
+          </div>
+          <div class="card-body">
+            <form onsubmit="guardarPerfil(event)" style="max-width:480px">
+              <div class="form-group">
+                <label class="form-label">Nombre completo</label>
+                <input type="text" class="form-control" id="p-nombre" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Correo electrónico</label>
+                <input type="email" class="form-control" id="p-email" disabled style="background:var(--gray-50);color:var(--gray-500)">
+                <div class="form-hint">El email no puede modificarse</div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">WhatsApp</label>
+                <div class="d-flex align-center gap-1">
+                  <span style="font-size:.85rem;color:var(--gray-500);white-space:nowrap;padding:.65rem .75rem;background:var(--gray-50);border:1.5px solid var(--gray-200);border-right:none;border-radius:var(--radius-md) 0 0 var(--radius-md)">+51</span>
+                  <input type="tel" class="form-control" id="p-whatsapp" maxlength="9" pattern="9[0-9]{8}" style="border-radius:0 var(--radius-md) var(--radius-md) 0" required>
+                </div>
+              </div>
+              <button type="submit" class="btn btn-primary" id="btn-guardar-perfil">
+                <i class="fa-solid fa-floppy-disk"></i> Guardar cambios
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab: CV -->
+      <div id="tab-cv" class="tab-panel" style="display:none">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title"><i class="fa-solid fa-file-pdf" style="color:var(--blue);margin-right:.5rem"></i>Mi currículum (CV)</span>
+          </div>
+          <div class="card-body">
+            <div id="cv-actual" style="margin-bottom:1.5rem"></div>
+
+            <div class="cv-dropzone" id="cv-dropzone" onclick="document.getElementById('cv-input').click()"
+                 ondragover="cvDragOver(event)" ondragleave="cvDragLeave(event)" ondrop="cvDrop(event)">
+              <i class="fa-solid fa-cloud-arrow-up"></i>
+              <h3 style="font-size:1rem;font-weight:600;margin-bottom:.35rem">Sube tu CV en PDF</h3>
+              <p style="font-size:.83rem;color:var(--gray-400)">Arrastra aquí o haz clic para seleccionar</p>
+              <p style="font-size:.75rem;color:var(--gray-300);margin-top:.4rem">Máximo 5 MB · Solo PDF</p>
+            </div>
+            <input type="file" id="cv-input" accept=".pdf" style="display:none" onchange="subirCV(event)">
+
+            <div id="cv-progress" style="display:none;margin-top:1rem">
+              <div style="height:4px;background:var(--gray-100);border-radius:4px;overflow:hidden">
+                <div id="cv-bar" style="height:100%;background:var(--blue);width:0%;transition:width .3s ease;border-radius:4px"></div>
+              </div>
+              <p style="font-size:.8rem;color:var(--gray-500);margin-top:.4rem;text-align:center" id="cv-status">Subiendo...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<footer style="background:var(--navy-dark);padding:1.5rem;text-align:center">
+  <p style="color:rgba(255,255,255,.4);font-size:.8rem">© 2025 Workify</p>
+</footer>
+
+<script src="/js/core.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  if (!Auth.isLoggedIn()) {
+    document.getElementById('auth-wall').style.display = 'block';
+    return;
+  }
+  initDashboard();
+});
+
+function initDashboard() {
+  const u = Auth.user;
+  document.getElementById('dashboard').style.display = 'grid';
+  document.getElementById('sb-avatar').textContent = u.nombre?.charAt(0).toUpperCase() || '?';
+  document.getElementById('sb-name').textContent   = u.nombre || 'Usuario';
+  document.getElementById('sb-role').textContent   = u.rol === 'admin' ? 'Administrador' : 'Cuenta personal';
+
+  // Pre-llenar perfil
+  document.getElementById('p-nombre').value    = u.nombre    || '';
+  document.getElementById('p-email').value     = u.email     || '';
+  document.getElementById('p-whatsapp').value  = u.whatsapp  || '';
+
+  renderCVActual();
+  loadPostulaciones();
+
+  // Leer hash de URL para abrir tab directamente
+  const hash = window.location.hash.replace('#', '');
+  if (hash) {
+    const btn = document.querySelector(`.sidebar-link[onclick*="${hash}"]`);
+    if (btn) showTab(hash, btn);
+  }
+}
+
+function showTab(tab, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.style.display = 'none');
+  document.querySelectorAll('.sidebar-link').forEach(b => b.classList.remove('active'));
+  document.getElementById(`tab-${tab}`).style.display = 'block';
+  if (btn) btn.classList.add('active');
+
+  // Cargar datos lazy
+  if (tab === 'postulaciones') loadPostulaciones();
+  if (tab === 'publicaciones') loadPublicaciones();
+  if (tab === 'solicitudes')   loadSolicitudes();
+}
+
+// ── Postulaciones ─────────────────────────────────────────────
+async function loadPostulaciones() {
+  const el = document.getElementById('postulaciones-content');
+  el.innerHTML = '<div class="loading-overlay"><span class="spinner dark"></span>Cargando...</div>';
+  try {
+    const data = await api.get('/api/postulaciones/mis-postulaciones');
+    if (!data.length) {
+      el.innerHTML = `<div class="empty-state">
+        <i class="fa-solid fa-paper-plane"></i>
+        <h3>Sin postulaciones</h3>
+        <p>Aún no te has postulado a ninguna oferta.</p>
+        <a href="/pages/ofertas.html" class="btn btn-outline btn-sm">Ver ofertas</a>
+      </div>`;
+      return;
+    }
+    el.innerHTML = `<div class="table-wrap"><table class="table">
+      <thead><tr>
+        <th>Oferta</th><th>Empresa</th><th>Fecha</th><th>Estado</th><th>CV</th>
+      </tr></thead>
+      <tbody>
+      ${data.map(p => `<tr>
+        <td style="font-weight:600;color:var(--navy)">${p.publicaciones?.titulo || '—'}</td>
+        <td style="font-size:.85rem;color:var(--gray-500)">${p.publicaciones?.usuarios?.nombre || '—'}</td>
+        <td style="font-size:.82rem;color:var(--gray-400)">${formatFecha(p.fecha_postulacion)}</td>
+        <td>${estadoBadge(p.estado)}</td>
+        <td>${p.cv_url ? `<a href="${p.cv_url}" target="_blank" class="btn btn-sm btn-ghost" title="Ver CV"><i class="fa-solid fa-file-pdf" style="color:var(--danger)"></i></a>` : '—'}</td>
+      </tr>`).join('')}
+      </tbody>
+    </table></div>`;
+  } catch { el.innerHTML = '<div class="empty-state"><i class="fa-solid fa-circle-exclamation"></i><h3>Error al cargar</h3></div>'; }
+}
+
+// ── Publicaciones ─────────────────────────────────────────────
+async function loadPublicaciones() {
+  const el = document.getElementById('publicaciones-content');
+  el.innerHTML = '<div class="loading-overlay"><span class="spinner dark"></span>Cargando...</div>';
+  try {
+    const data = await api.get('/api/solicitudes-pago/mis-solicitudes');
+    if (!data.length) {
+      el.innerHTML = `<div class="empty-state">
+        <i class="fa-solid fa-bullhorn"></i>
+        <h3>Sin publicaciones</h3>
+        <p>Aún no has publicado nada.</p>
+        <a href="/pages/publicar.html" class="btn btn-primary btn-sm">Publicar ahora</a>
+      </div>`;
+      return;
+    }
+    el.innerHTML = `<div style="display:flex;flex-direction:column;gap:.75rem">
+      ${data.map(p => `
+        <div style="background:var(--gray-50);border-radius:var(--radius-lg);padding:1.1rem 1.25rem;border:1px solid var(--gray-100);display:flex;align-items:center;gap:1rem;flex-wrap:wrap">
+          <div style="width:38px;height:38px;background:${p.tipo==='oferta'?'rgba(33,150,243,.1)':'rgba(0,188,212,.1)'};border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <i class="fa-solid ${p.tipo==='oferta'?'fa-briefcase':'fa-wrench'}" style="color:${p.tipo==='oferta'?'var(--blue)':'var(--teal)'}"></i>
+          </div>
+          <div style="flex:1;min-width:0">
+            <div style="font-weight:700;font-size:.92rem;color:var(--navy)">${p.titulo}</div>
+            <div style="font-size:.78rem;color:var(--gray-400)">
+              ${p.tipo==='oferta'?'Oferta laboral':'Servicio'} · Vence ${formatFecha(p.fecha_fin)}
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:.5rem;flex-wrap:wrap">
+            ${p.destacado ? '<span class="badge badge-destacado">Destacado</span>' : ''}
+            <span class="badge ${p.activo ? 'badge-green' : 'badge-red'}">${p.activo ? 'Activo' : 'Inactivo'}</span>
+            ${p.tipo === 'oferta' ? `<button class="btn btn-sm btn-outline" onclick="verPostulaciones(${p.id}, '${p.titulo.replace(/'/g,"\\'")}')"><i class="fa-solid fa-users"></i> Postulantes</button>` : ''}
+          </div>
+        </div>
+      `).join('')}
+    </div>`;
+  } catch { el.innerHTML = '<div class="empty-state"><i class="fa-solid fa-circle-exclamation"></i><h3>Error al cargar</h3></div>'; }
+}
+
+// ── Solicitudes de pago ───────────────────────────────────────
+async function loadSolicitudes() {
+  const el = document.getElementById('solicitudes-content');
+  el.innerHTML = '<div class="loading-overlay"><span class="spinner dark"></span>Cargando...</div>';
+  try {
+    const data = await api.get('/api/publicaciones/solicitudes-pago/mis-solicitudes');
+    if (!data.length) {
+      el.innerHTML = `<div class="empty-state">
+        <i class="fa-solid fa-credit-card"></i>
+        <h3>Sin solicitudes</h3>
+        <p>No tienes solicitudes de pago registradas.</p>
+        <a href="/pages/publicar.html" class="btn btn-primary btn-sm">Crear publicación</a>
+      </div>`;
+      return;
+    }
+    el.innerHTML = `<div class="table-wrap"><table class="table">
+      <thead><tr><th>#ID</th><th>Tipo</th><th>Plan</th><th>Fecha</th><th>Estado</th><th>Acción</th></tr></thead>
+      <tbody>
+      ${data.map(s => `<tr>
+        <td style="font-weight:700;color:var(--navy)">#${s.id}</td>
+        <td>${s.tipo === 'oferta' ? 'Oferta laboral' : 'Servicio'}</td>
+        <td><span class="badge ${s.plan==='destacado'?'badge-gold':'badge-gray'}">${s.plan==='basico'?'Básico S/5':'Destacado S/10'}</span></td>
+        <td style="font-size:.82rem;color:var(--gray-400)">${formatFecha(s.fecha_solicitud)}</td>
+        <td>${estadoBadge(s.estado)}</td>
+        <td>
+          ${s.estado === 'pago_verificado'
+            ? `<a href="/pages/publicar.html" class="btn btn-sm btn-success"><i class="fa-solid fa-pen"></i> Completar</a>`
+            : s.estado === 'esperando_confirmacion'
+            ? `<a href="/pages/publicar.html" class="btn btn-sm btn-outline"><i class="fa-solid fa-eye"></i> Ver estado</a>`
+            : '—'}
+        </td>
+      </tr>`).join('')}
+      </tbody>
+    </table></div>`;
+  } catch { el.innerHTML = '<div class="empty-state"><i class="fa-solid fa-circle-exclamation"></i><h3>Error al cargar</h3></div>'; }
+}
+
+// ── Ver postulantes de una oferta ─────────────────────────────
+async function verPostulaciones(ofertaId, titulo) {
+  Panel.open({
+    title: `Postulantes: ${titulo}`,
+    subtitle: 'Candidatos que aplicaron a tu oferta',
+    body: '<div class="loading-overlay"><span class="spinner dark"></span>Cargando...</div>'
+  });
+  try {
+    const data = await api.get(`/api/postulaciones/oferta/${ofertaId}`);
+    if (!data.length) {
+      Panel.setBody('<div class="empty-state"><i class="fa-solid fa-users"></i><h3>Sin postulantes aún</h3><p>Nadie se ha postulado todavía.</p></div>');
+      return;
+    }
+
+    const estadoOpts = ['recibido','en_revision','contratado','rechazado'];
+    const body = data.map(p => `
+      <div style="background:var(--gray-50);border-radius:var(--radius-lg);padding:1.1rem;margin-bottom:.75rem;border:1px solid var(--gray-100)">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:.75rem;margin-bottom:.75rem">
+          <div>
+            <div style="font-weight:700;font-size:.92rem;color:var(--navy)">${p.usuarios?.nombre || '—'}</div>
+            <div style="font-size:.78rem;color:var(--gray-500)">${p.usuarios?.email || ''}</div>
+          </div>
+          ${estadoBadge(p.estado)}
+        </div>
+        <div style="display:flex;align-items:center;gap:.5rem;flex-wrap:wrap">
+          <select class="form-control" style="max-width:160px;font-size:.82rem;padding:.35rem .6rem"
+            onchange="cambiarEstadoPost(${p.id}, this.value)">
+            ${estadoOpts.map(e => `<option value="${e}" ${e===p.estado?'selected':''}>${e.replace('_',' ')}</option>`).join('')}
+          </select>
+          ${p.usuarios?.whatsapp ? `
+            <a href="${urlWhatsApp(p.usuarios.whatsapp, `Hola ${p.usuarios.nombre}, sobre tu postulación en Workify.`)}"
+               target="_blank" class="btn btn-sm btn-whatsapp"><i class="fa-brands fa-whatsapp"></i> Contactar</a>` : ''}
+          ${p.cv_url ? `<a href="${p.cv_url}" target="_blank" class="btn btn-sm btn-outline"><i class="fa-solid fa-file-pdf" style="color:var(--danger)"></i> Ver CV</a>` : ''}
+        </div>
+      </div>`).join('');
+
+    Panel.setBody(body);
+  } catch { Panel.setBody('<div class="empty-state"><i class="fa-solid fa-circle-exclamation"></i><h3>Error al cargar</h3></div>'); }
+}
+
+async function cambiarEstadoPost(postId, estado) {
+  try {
+    await api.patch(`/api/postulaciones/${postId}/estado`, { estado });
+    Toast.success('Estado actualizado');
+  } catch (err) { Toast.error(err.message); }
+}
+
+// ── Guardar perfil ────────────────────────────────────────────
+async function guardarPerfil(e) {
+  e.preventDefault();
+  const btn = document.getElementById('btn-guardar-perfil');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Guardando...';
+
+  const nombre   = document.getElementById('p-nombre').value.trim();
+  const whatsapp = document.getElementById('p-whatsapp').value;
+
+  try {
+    const data = await api.put('/auth/perfil', { nombre, whatsapp });
+    Auth.save(Auth.token, data.user);
+    document.getElementById('sb-name').textContent    = data.user.nombre;
+    document.getElementById('sb-avatar').textContent  = data.user.nombre.charAt(0).toUpperCase();
+    Toast.success('Perfil actualizado correctamente');
+  } catch (err) { Toast.error(err.message); }
+
+  btn.disabled = false;
+  btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Guardar cambios';
+}
+
+// ── CV ────────────────────────────────────────────────────────
+function renderCVActual() {
+  const el = document.getElementById('cv-actual');
+  if (Auth.user.cv_url) {
+    el.innerHTML = `
+      <div class="highlight-box d-flex align-center gap-2">
+        <i class="fa-solid fa-file-pdf" style="color:var(--danger);font-size:1.4rem"></i>
+        <div style="flex:1">
+          <div style="font-size:.88rem;font-weight:600;color:var(--navy)">CV cargado correctamente</div>
+          <a href="${Auth.user.cv_url}" target="_blank" style="font-size:.8rem;color:var(--blue)">Ver mi CV actual <i class="fa-solid fa-external-link-alt fa-xs"></i></a>
+        </div>
+        <span class="badge badge-green">Activo</span>
+      </div>
+      <p style="font-size:.82rem;color:var(--gray-500);margin-top:.75rem">Puedes reemplazarlo subiendo un nuevo archivo.</p>`;
+  } else {
+    el.innerHTML = `
+      <div class="warning-box d-flex align-center gap-2">
+        <i class="fa-solid fa-triangle-exclamation" style="color:#f59e0b"></i>
+        <div>
+          <div style="font-size:.88rem;font-weight:600">No tienes CV</div>
+          <p style="font-size:.8rem;color:var(--gray-600)">Sin CV no podrás postularte a ofertas laborales.</p>
+        </div>
+      </div>`;
+  }
+}
+
+function cvDragOver(e)  { e.preventDefault(); document.getElementById('cv-dropzone').classList.add('drag-over'); }
+function cvDragLeave()  { document.getElementById('cv-dropzone').classList.remove('drag-over'); }
+function cvDrop(e)      { e.preventDefault(); cvDragLeave(); const f = e.dataTransfer.files[0]; if (f) procesarCV(f); }
+
+function subirCV(e) {
+  const f = e.target.files[0];
+  if (f) procesarCV(f);
+}
+
+async function procesarCV(file) {
+  if (file.type !== 'application/pdf') { Toast.error('Solo se permiten archivos PDF'); return; }
+  if (file.size > 5 * 1024 * 1024)    { Toast.error('El archivo supera los 5 MB'); return; }
+
+  const progress = document.getElementById('cv-progress');
+  const bar      = document.getElementById('cv-bar');
+  const status   = document.getElementById('cv-status');
+  progress.style.display = 'block';
+
+  // Simular progreso visual
+  let p = 0;
+  const interval = setInterval(() => {
+    p = Math.min(p + 15, 85);
+    bar.style.width = p + '%';
+  }, 200);
+
+  const form = new FormData();
+  form.append('cv', file);
+
+  try {
+    const data = await api.upload('/auth/cv', form);
+    clearInterval(interval);
+    bar.style.width = '100%';
+    status.textContent = '¡CV subido!';
+
+    Auth.user.cv_url = data.cv_url;
+    localStorage.setItem('wk_user', JSON.stringify(Auth.user));
+    renderCVActual();
+    Toast.success('CV actualizado correctamente');
+
+    setTimeout(() => { progress.style.display = 'none'; bar.style.width = '0'; }, 1500);
+  } catch (err) {
+    clearInterval(interval);
+    progress.style.display = 'none';
+    Toast.error(err.message || 'Error al subir el CV');
+  }
+}
+</script>
+</body>
+</html>
