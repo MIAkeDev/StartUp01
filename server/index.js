@@ -18,7 +18,7 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, '../pages')));
 app.use('/css', express.static(path.join(__dirname, '../css')));
-
+app.use('/pages', express.static(path.join(__dirname, '../pages')));
 app.get('/videofondo.mp4', (req, res) => {
   res.sendFile(path.join(__dirname, '../videofondo.mp4'));
 });
