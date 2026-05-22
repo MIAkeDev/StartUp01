@@ -16,9 +16,9 @@ app.use(cors({
 }));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, '../pages')));
-app.use('/css', express.static(path.join(__dirname, '../css')));
-app.use('/pages', express.static(path.join(__dirname, '../pages')));
+app.use(express.static(path.join(__dirname, '../public')));
+//app.use('/css', express.static(path.join(__dirname, '../css')));
+//app.use('/pages', express.static(path.join(__dirname, '../pages')));
 app.get('/videofondo.mp4', (req, res) => {
   res.sendFile(path.join(__dirname, '../videofondo.mp4'));
 });
@@ -36,7 +36,7 @@ app.use('/admin',                 require('./routes/admin'));
 app.get('*', (req, res) => {
   if (req.path.startsWith('/api') || req.path.startsWith('/auth') || req.path.startsWith('/admin'))
     return res.status(404).json({ error: 'Ruta no encontrada' });
-  res.sendFile(path.join(__dirname, '../pages/index.html'));
+  res.sendFile(path.join(__dirname, '../public/index.html'));
 });
 
 // ── Cron: desactivar publicaciones vencidas (medianoche) ──────
