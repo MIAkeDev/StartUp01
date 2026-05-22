@@ -220,20 +220,32 @@ const Modal = {
 };
 
 // ── Confirm dialog ────────────────────────────────────────────
+
+
+// ── Confirm dialog (Corregido) ────────────────────────────────
 function confirmDialog(message, onConfirm, title = '¿Estás seguro?') {
-  Modal.open(`
+  // 1. Abrimos el modal y guardamos el elemento que retorna
+  const modalEl = Modal.open(`
     <div class="modal-header">
       <div class="modal-icon danger"><i class="fa-solid fa-triangle-exclamation"></i></div>
       <h3 style="font-size:1.1rem;margin-bottom:.4rem">${title}</h3>
       <p style="font-size:.88rem;color:var(--gray-500)">${message}</p>
     </div>
     <div class="modal-footer">
-      <button class="btn btn-outline" onclick="Modal.close()">Cancelar</button>
-      <button class="btn btn-danger" onclick="(${onConfirm.toString()})(); Modal.close();">
-        Confirmar
-      </button>
+      <button class="btn btn-outline" id="modal-btn-cancel">Cancelar</button>
+      <button class="btn btn-danger" id="modal-btn-confirm">Confirmar</button>
     </div>
   `);
+
+  // 2. Asignamos los eventos correctamente para no perder el scope de las variables
+  document.getElementById('modal-btn-cancel').addEventListener('click', () => {
+    Modal.close();
+  });
+
+  document.getElementById('modal-btn-confirm').addEventListener('click', () => {
+    onConfirm(); // Ejecuta la función original conservando 'id' y 'estado'
+    Modal.close();
+  });
 }
 
 // ── Helpers UI ────────────────────────────────────────────────
