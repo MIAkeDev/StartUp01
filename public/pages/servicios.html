@@ -217,7 +217,8 @@ async function verDetalleServicio(id) {
   try {
     const pub = await api.get(`/api/publicaciones/${id}`);
     renderDetalleServicio(pub);
-  } catch {
+  } catch (err) {
+    console.error("Error exacto:", err);
     Panel.setBody('<div class="empty-state"><i class="fa-solid fa-circle-exclamation"></i><h3>Error al cargar</h3></div>');
   }
 }
