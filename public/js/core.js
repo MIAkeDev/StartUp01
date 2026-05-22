@@ -595,4 +595,4 @@ document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('.nav-link[href]').forEach(a => {
     if (a.getAttribute('href') === path) a.classList.add('active');
   });
-});s
+});
