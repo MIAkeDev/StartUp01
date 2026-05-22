@@ -226,7 +226,9 @@ function renderDetalleServicio(s) {
   const d    = s.detalles || {};
   const prom = parseFloat(s.promedio_estrellas || 0);
   const wsMsg = `Hola, requiero tu servicio '${s.titulo}' vengo de la web Workify. ¿Podemos coordinar?`;
-  const wsNum = d.numero_wsp;
+  //const wsNum = d.numero_wsp;
+  // PON ESTA LÍNEA EN SU LUGAR:
+  const wsNum = d.numero_wsp ? String(d.numero_wsp) : null;
 
   //document.querySelector('.panel-header h2').textContent = s.titulo;
   //document.querySelector('.panel-header p').textContent  = s.usuarios?.nombre || 'Profesional';
