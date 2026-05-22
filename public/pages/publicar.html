@@ -533,7 +533,7 @@ async function crearSolicitud() {
 }
 
 function generarLinkWsp(sol) {
-  const adminNum = '51999999999'; // Se reemplaza con var de entorno
+  const adminNum = '51920632668'; // Se reemplaza con var de entorno
   const msg = `Hola, deseo pagar el plan ${sol.plan === 'basico' ? 'Básico (S/5)' : 'Destacado (S/10)'} para mi publicación tipo ${sol.tipo === 'oferta' ? 'Oferta Laboral' : 'Servicio Independiente'}. Mi ID de solicitud es #${sol.id}. Quedo atento.`;
   return `https://wa.me/${adminNum}?text=${encodeURIComponent(msg)}`;
 }
