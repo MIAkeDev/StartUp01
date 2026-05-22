@@ -19,6 +19,11 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, '../pages')));
 app.use('/css', express.static(path.join(__dirname, '../css')));
 
+app.get('/videofondo.mp4', (req, res) => {
+  res.sendFile(path.join(__dirname, '../videofondo.mp4'));
+});
+
+
 // ── Rutas API ─────────────────────────────────────────────────
 app.use('/auth',                  require('./routes/auth'));
 app.use('/api/publicaciones',     require('./routes/publicaciones'));
