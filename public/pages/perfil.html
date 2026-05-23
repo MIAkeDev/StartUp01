@@ -265,7 +265,7 @@ async function loadPublicaciones() {
   const el = document.getElementById('publicaciones-content');
   el.innerHTML = '<div class="loading-overlay"><span class="spinner dark"></span>Cargando...</div>';
   try {
-    const data = await api.get('/api/solicitudes-pago/mis-solicitudes');
+    const data = await api.get('/api/publicaciones/mis-publicaciones');
     if (!data.length) {
       el.innerHTML = `<div class="empty-state">
         <i class="fa-solid fa-bullhorn"></i>
@@ -303,7 +303,7 @@ async function loadSolicitudes() {
   const el = document.getElementById('solicitudes-content');
   el.innerHTML = '<div class="loading-overlay"><span class="spinner dark"></span>Cargando...</div>';
   try {
-    const data = await api.get('/api/publicaciones/solicitudes-pago/mis-solicitudes');
+    const data = await api.get('/api/solicitudes-pago/mis-solicitudes');
     if (!data.length) {
       el.innerHTML = `<div class="empty-state">
         <i class="fa-solid fa-credit-card"></i>
