@@ -255,10 +255,12 @@ function renderDetalleOferta(o) {
   const d = o.detalles || {};
   const dias = diasRestantes(o.fecha_fin);
   const wsMsg = `Hola, me interesa tu oferta "${o.titulo}". Vi tu publicación en Workify.`;
-  const wsNum = d.telefono_contacto || o.usuarios?.whatsapp;
-
-  document.querySelector('.panel-header h2').textContent = o.titulo;
-  document.querySelector('.panel-header p').textContent  = o.usuarios?.nombre || 'Empresa';
+  
+  // 1. Guardamos el número y lo convertimos a texto (String) de forma segura
+  const numeroCrudo = d.telefono_contacto || o.usuarios?.whatsapp;
+  const wsNum = numeroCrudo ? String(numeroCrudo) : null;
+  //document.querySelector('.panel-header h2').textContent = o.titulo;
+  //document.querySelector('.panel-header p').textContent  = o.usuarios?.nombre || 'Empresa';
 
   const body = `
     <div style="display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:1.25rem">
