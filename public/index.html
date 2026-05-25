@@ -295,7 +295,7 @@
       ¿Listo para empezar?
     </h2>
     <p style="color:rgba(255,255,255,.65);max-width:400px;margin:0 auto 2rem;font-size:1rem">
-      Únete a cientos de profesionales y empleadores en Workify.
+      Únete a cientos de profesionales y empleadores en Chambealo.
     </p>
     <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
       <button class="btn btn-teal btn-lg" onclick="openAuthModal('register')">
@@ -312,7 +312,7 @@
 <footer>
   <div class="footer-content">
     <div>
-      <div class="footer-brand">Workify<span style="color:var(--teal)">.</span></div>
+      <div class="footer-brand">Chambealo<span style="color:var(--teal)">.</span></div>
       <p style="font-size:.85rem;max-width:260px;line-height:1.6">Conectamos el talento peruano con las oportunidades que merecen.</p>
     </div>
     <div>
@@ -487,7 +487,7 @@ async function verDetalle(id, tipo) {
 function renderDetalleOferta(o) {
   const d = o.detalles || {};
   const dias = diasRestantes(o.fecha_fin);
-  const wsMsg = `Hola, me interesa tu oferta "${o.titulo}". Vi tu publicación en Workify.`;
+  const wsMsg = `Hola, me interesa tu oferta "${o.titulo}". Vi tu publicación en Chambealo.`;
   
   // 1. Guardamos el número y lo convertimos a texto (String) de forma segura
   const numeroCrudo = d.telefono_contacto || o.usuarios?.whatsapp;
@@ -578,7 +578,7 @@ function renderDetalleOferta(o) {
 function renderDetalleServicio(s) {
   const d    = s.detalles || {};
   const prom = parseFloat(s.promedio_estrellas || 0);
-  const wsMsg = `Hola, requiero tu servicio '${s.titulo}' vengo de la web Workify. ¿Podemos coordinar?`;
+  const wsMsg = `Hola, requiero tu servicio '${s.titulo}' vengo de la web Chambealo. ¿Podemos coordinar?`;
   //const wsNum = d.numero_wsp;
   // PON ESTA LÍNEA EN SU LUGAR:
   const wsNum = d.numero_wsp ? String(d.numero_wsp) : null;
